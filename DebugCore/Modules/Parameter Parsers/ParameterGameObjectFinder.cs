@@ -64,3 +64,61 @@ public class ParameterGameObjectFinder
         return result;
     }
 }
+
+
+//helper datatype used as an argument by command functions that finds a gameobject for use as an object reference in the command
+public class GameObjectFinder
+{
+    private GameObjectFinderTargeting targetMode;
+    private string targetObjectName;
+    public GameObject result;
+
+    public GameObjectFinder(GameObjectFinderTargeting argTargetMode)
+    {
+        targetMode = argTargetMode;
+        FindObject();
+    }
+
+    public GameObjectFinder(GameObjectFinderTargeting argTargetMode, string argTargetObjectName)
+    {
+        targetMode = argTargetMode;
+        targetObjectName = argTargetObjectName;
+        FindObject();
+    }
+
+    private void FindObject()
+    {
+        switch (targetMode)
+        {
+            case GameObjectFinderTargeting.MousePosition:
+                Ray finderRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit finderHit;
+
+                if (Physics.Raycast(finderRay, out finderHit))
+                {
+                    result = finderHit.transform.gameObject;
+                }
+                break;
+
+            case GameObjectFinderTargeting.ForwardCast:
+                //NYI
+                break;
+
+            case GameObjectFinderTargeting.ObjectName:
+                GameObject finder = GameObject.Find(targetObjectName);
+                if (finder != null)
+                {
+                    result = finder.transform.gameObject;
+                }
+                break;
+        }
+    }
+}
+
+//methods of finding a gameobject
+public enum GameObjectFinderTargeting
+{
+    MousePosition,
+    ForwardCast,
+    ObjectName
+}
