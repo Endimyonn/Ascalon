@@ -15,7 +15,7 @@ public class DebugFeed : DebugUIModule
 
     //tracking
     //todo: sort better
-    [SerializeField] private InputField uiInputField;
+    [SerializeField] private TMP_InputField uiInputField;
 
     [SerializeField] private GameObject uiDebugLogPanel;
     public GameObject uiDebugLogContent;
@@ -46,6 +46,7 @@ public class DebugFeed : DebugUIModule
     //view management
     public bool logWasAtBottom = false;
     public bool entryAdded = false;
+    public bool inputFieldActive = false;
 
     public override void Awake()
     {
@@ -381,6 +382,12 @@ public class DebugFeed : DebugUIModule
             uiSuggestionPanel.SetActive(false);
         }
     }
+
+
+
+
+
+
 
 
     //todo: these can be simplified

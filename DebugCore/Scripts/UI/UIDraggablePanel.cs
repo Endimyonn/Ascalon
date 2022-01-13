@@ -48,7 +48,7 @@ public class UIDraggablePanel : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        dragOffset = new Vector3(eventData.position.x, eventData.position.y) - transform.position;
+        dragOffset = new Vector3(eventData.position.x, eventData.position.y) - targetPanel.transform.position;
         dragging = true;
     }
 
