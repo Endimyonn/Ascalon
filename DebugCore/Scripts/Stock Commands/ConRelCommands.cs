@@ -96,12 +96,31 @@ public class ConRelCommands
         }
     }
 
+
+    //----------------------------------------------------------------------------------//
+    // The following commands and ConVars are vital to the functionality of the system! //
+    //              Do not delete them unless you know what you are doing!              //
+    //----------------------------------------------------------------------------------//
+
     //control whether we accept calls from other clients in a server
-    //this is typically very dangerous and should not be enabled by default
     [ConVar("client_allowclientcall", "Allows other clients to send calls to the player.", ConFlags.LockWhileConnected)]
     static ConVar cvar_client_allowclientcall = new ConVar(false);
 
     //control whether we accept calls without ClientReplicated from a server
     [ConVar("client_allowservercall", "Allows the server to send non-standard calls to the player", ConFlags.LockWhileConnected)]
     static ConVar cvar_client_allowservercall = new ConVar(false);
+
+    [ConVar("host_cheats", "Determines whether commands and ConVars marked\nas cheats may be used")]
+    static ConVar cvar_host_cheats = new ConVar(false);
+
+    [ConCommand("client_writeconfig", "Write a configuration file with the specified name")]
+    static void cmd_client_writeconfig(string argConfigName)
+    {
+        //stubbed until config reading/writing is implemented
+    }
+
+    //-------------------//
+    // End vital section //
+    //-------------------//
+
 }
