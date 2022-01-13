@@ -103,11 +103,11 @@ public class ConRelCommands
     //----------------------------------------------------------------------------------//
 
     //control whether we accept calls from other clients in a server
-    [ConVar("client_allowclientcall", "Allows other clients to send calls to the player.", ConFlags.LockWhileConnected)]
+    [ConVar("client_allowclientcall", "Allows other clients to send calls to the player.", ConFlags.LockWhileConnected | ConFlags.Save)]
     static ConVar cvar_client_allowclientcall = new ConVar(false);
 
     //control whether we accept calls without ClientReplicated from a server
-    [ConVar("client_allowservercall", "Allows the server to send non-standard calls to the player", ConFlags.LockWhileConnected)]
+    [ConVar("client_allowservercall", "Allows the server to send non-standard calls to the player", ConFlags.LockWhileConnected | ConFlags.Save)]
     static ConVar cvar_client_allowservercall = new ConVar(false);
 
     [ConVar("host_cheats", "Determines whether commands and ConVars marked\nas cheats may be used")]
@@ -116,7 +116,8 @@ public class ConRelCommands
     [ConCommand("client_writeconfig", "Write a configuration file with the specified name")]
     static void cmd_client_writeconfig(string argConfigName)
     {
-        //stubbed until config reading/writing is implemented
+        Debug.Log("Writing config to \"" + Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argConfigName + ".cfg\"");
+        DebugConfigTools.WriteConfigUnity(argConfigName);
     }
 
     //-------------------//

@@ -125,6 +125,9 @@ public partial class DebugCore : MonoBehaviour
             gatherTime.Minutes,
             gatherTime.Seconds,
             gatherTime.Milliseconds / 10));*/
+
+        //load config
+        DebugConfigTools.ReadConfig("config");
     }
 
     private void Update()
@@ -274,7 +277,6 @@ public partial class DebugCore : MonoBehaviour
 
                 if (instance.onCallCompleted != null) //callback
                 {
-                    Debug.Log("hit");
                     instance.onCallCompleted(argInput, false, argSource);
                 }
             }
