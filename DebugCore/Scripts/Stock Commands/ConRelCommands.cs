@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,17 +39,55 @@ public class ConRelCommands
                 parmsString = "None";   //if the command has no arguments
             }
 
+            string flagsString = "";
+            if (findCommand.flags == 0)
+            {
+                flagsString = " None";
+            }
+            else
+            {
+                foreach (ConFlags flag in Enum.GetValues(typeof(ConFlags)))
+                {
+                    if (findCommand.flags.HasFlag(flag))
+                    {
+                        flagsString += flag.ToString() + "\n";
+                    }
+                }
+
+                flagsString.Remove(flagsString.Length - 1, 1);
+            }
+
             DebugCore.FeedEntry("Help for command '" + findCommand.name + "':",
                                    " * Description:\n" + findCommand.description +
-                                   "\n\n * Parameters:\n" + parmsString,
+                                   "\n\n * Parameters:\n" + parmsString +
+                                   "\n\n * Flags: \n" + flagsString,
                                    FeedEntryType.Info);
         }
         else if (DebugCore.ConVarExists(argEntryName))
         {
+            string flagsString = "";
+            if (findConVar.flags == 0)
+            {
+                flagsString = " None";
+            }
+            else
+            {
+                foreach (ConFlags flag in Enum.GetValues(typeof(ConFlags)))
+                {
+                    if (findConVar.flags.HasFlag(flag))
+                    {
+                        flagsString += flag.ToString() + "\n";
+                    }
+                }
+
+                flagsString.Remove(flagsString.Length - 1, 1);
+            }
+
             DebugCore.FeedEntry("Help for ConVar '" + findConVar.name + "':",
                                    " * Value:\n" + DebugCoreUtil.ConVarDataToString(findConVar.GetData()) +
                                    "\n\n * Description:\n" + findConVar.description +
-                                   "\n\n * Type:\n" + findConVar.cvarDataType,
+                                   "\n\n * Type:\n" + findConVar.cvarDataType +
+                                   "\n\n * Flags:\n" + flagsString,
                                    FeedEntryType.Info);
         }
         else
@@ -59,10 +98,10 @@ public class ConRelCommands
 
     //control whether we accept calls from other clients in a server
     //this is typically very dangerous and should not be enabled by default
-    [ConVar("client_allowclientcall", ConFlags.LockWhileConnected)]
+    [ConVar("client_allowclientcall", "Allows other clients to send calls to the player.", ConFlags.LockWhileConnected)]
     static ConVar cvar_client_allowclientcall = new ConVar(false);
 
     //control whether we accept calls without ClientReplicated from a server
-    [ConVar("client_allowservercall", ConFlags.LockWhileConnected)]
+    [ConVar("client_allowservercall", "Allows the server to send non-standard calls to the player", ConFlags.LockWhileConnected)]
     static ConVar cvar_client_allowservercall = new ConVar(false);
 }
