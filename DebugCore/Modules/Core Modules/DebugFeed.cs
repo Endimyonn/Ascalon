@@ -56,6 +56,8 @@ public class DebugFeed : DebugUIModule
         Application.logMessageReceived += FeedLogHandler;
 
         uiEventSystem = EventSystem.current;
+
+        uiInputField.onSubmit.AddListener(Call);
     }
 
     private void Start()
@@ -491,9 +493,9 @@ public class DebugFeed : DebugUIModule
 
 
 
-    public void Call()
+    public void Call(string argInput)
     {
-        DebugCore.Call(uiInputField.text, DebugCallSource.User);
+        DebugCore.Call(argInput, DebugCallSource.User);
     }
 
 
