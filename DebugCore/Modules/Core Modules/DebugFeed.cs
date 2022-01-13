@@ -469,6 +469,21 @@ public class DebugFeed : DebugUIModule
 
 
 
+    public void Clear()
+    {
+        foreach (Transform feedEntry in uiDebugLogContent.transform)
+        {
+            GameObject.Destroy(feedEntry.gameObject);
+        }
+    }
+
+
+
+
+
+
+
+
     public void Call()
     {
         DebugCore.Call(uiInputField.text, DebugCallSource.User);
