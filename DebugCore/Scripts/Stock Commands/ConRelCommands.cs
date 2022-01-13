@@ -124,4 +124,9 @@ public class ConRelCommands
     // End vital section //
     //-------------------//
 
+    [ConCommand("client_runconfig", "Run a configuration file with the specified name")]
+    static void cmd_client_runconfig(string argConfigName)
+    {
+        DebugConfigTools.ReadConfigUnity(argConfigName);
+    }
 }

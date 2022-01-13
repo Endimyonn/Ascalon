@@ -127,7 +127,8 @@ public partial class DebugCore : MonoBehaviour
             gatherTime.Milliseconds / 10));*/
 
         //load config
-        DebugConfigTools.ReadConfig("config");
+        //todo: better system for raw C# implementations
+        DebugConfigTools.ReadConfigUnity("config");
     }
 
     private void Update()

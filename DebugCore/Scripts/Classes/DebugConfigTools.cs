@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 
+//Tools for writing and reading config files formatted for DebugCore
+
 public class DebugConfigTools
 {
     public static async void WriteConfig(string argPath)
@@ -42,9 +44,9 @@ public class DebugConfigTools
         WriteConfig(Application.persistentDataPath + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
     }
 
-    public static void ReadConfig(string argFileName)
+    public static void ReadConfig(string argPath)
     {
-        using (System.IO.StreamReader reader = new System.IO.StreamReader(Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argFileName + ".cfg"))
+        using (System.IO.StreamReader reader = new System.IO.StreamReader(argPath))
         {
             string line = "";
             while ((line = reader.ReadLine()) != null)
@@ -55,5 +57,10 @@ public class DebugConfigTools
                 }
             }
         }
+    }
+
+    public static void ReadConfigUnity(string argFileName)
+    {
+        ReadConfig(Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argFileName + ".cfg");
     }
 }
