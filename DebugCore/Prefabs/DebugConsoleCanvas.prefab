@@ -792,6 +792,7 @@ GameObject:
   - component: {fileID: 2192761646840010232}
   - component: {fileID: 3266074209289340494}
   - component: {fileID: 6093585242769294849}
+  - component: {fileID: 462448152992196468}
   m_Layer: 5
   m_Name: DebugConsolePanel
   m_TagString: Untagged
@@ -954,6 +955,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isClient: 0
   sessionActive: 0
+--- !u!114 &462448152992196468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713012737140593718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9eb59ff3e5975846a44ebc7d81429d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1817796457143754021
 GameObject:
   m_ObjectHideFlags: 0

@@ -50,8 +50,18 @@ public class DebugConfigTools
         WriteConfig(Application.persistentDataPath + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
     }
 
-    public static void ReadConfig(string argPath)
+    public static void ReadConfig(string argPath, bool argSilent)
     {
+        //handle bad config names
+        if (!File.Exists(argPath))
+        {
+            if (!argSilent)
+            {
+                DebugCore.FeedEntry("Configuration file not found.", "File \"" + argPath + "\" does not exist.", FeedEntryType.Warning);
+            }
+            return;
+        }
+
         using (System.IO.StreamReader reader = new System.IO.StreamReader(argPath))
         {
             string line = "";
@@ -63,6 +73,11 @@ public class DebugConfigTools
                 }
             }
         }
+    }
+
+    public static void ReadConfig(string argPath)
+    {
+        ReadConfig(argPath, false);
     }
 
     public static void ReadConfigUnity(string argFileName)
