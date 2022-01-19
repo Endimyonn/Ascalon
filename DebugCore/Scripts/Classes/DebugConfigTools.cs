@@ -29,7 +29,7 @@ public class DebugConfigTools
                 cfgString = cfgString.Remove(cfgString.Length - 1, 1);
             }
 
-            Debug.Log(argPath);
+            
             using (StreamWriter writer = new StreamWriter(argPath, false))
             {
                 writer.Write(cfgString);
@@ -41,6 +41,12 @@ public class DebugConfigTools
 
     public static void WriteConfigUnity(string argFileName)
     {
+        //ensure config directory exists
+        if (!Directory.Exists(Application.persistentDataPath + Path.DirectorySeparatorChar + "config"))
+        {
+            Directory.CreateDirectory(Application.persistentDataPath + Path.DirectorySeparatorChar + "config");
+        }
+
         WriteConfig(Application.persistentDataPath + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
     }
 
