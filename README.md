@@ -1,5 +1,5 @@
 # DebugCore
-DebugCore is a modular, extensible tool providing a system which can create and interact with ConCommands, ConVars, and ConClasses.
+DebugCore is a modular, extensible tool providing a system which can create and interact with ConCommands, ConVars.
 
 DebugCore is designed for Unity, but can be run with minimal changes in any C# environment supporting reflections.
 
@@ -11,10 +11,13 @@ To call a ConCommand or ConVar, run `DebugCore.Call("<command> <args>")`.
 ## Features
 - ConCommands
 - ConVars
+- Command processor
+- Networking support
 - Flags for access control
 
 ## Planned features
 - Networking support
     - Default implementations for popular libraries
-- ConClasses
-    - Instance-referenced classes which can be manipulated directly through calls
+        - Mirror ✔
+        - Photon Bolt
+        - Networking for GameObjects
