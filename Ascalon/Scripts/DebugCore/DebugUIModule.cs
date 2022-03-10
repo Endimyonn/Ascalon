@@ -7,7 +7,7 @@ using UnityEngine;
 //sending Calls to it and/or receiving output from it.
 
 //This module is not necessary for DebugCore to function.
-public class DebugUIModule : MonoBehaviour
+public abstract class DebugUIModule : MonoBehaviour
 {
     //singleton
     public static DebugUIModule instance;
@@ -23,27 +23,30 @@ public class DebugUIModule : MonoBehaviour
 
     public virtual void Update()
     {
-        //stub, optional
+        
     }
 
     public virtual void LateUpdate()
     {
-        //stub, optional
+        
     }
 
-    public virtual void OnCallComplete(string argCallString, bool argSuccess, DebugCallSource argSource)
+    //gets run after a call is completed - for instance, this can be used to clear an input field. optional
+    public virtual void OnCallComplete(string argCallString, bool argSuccess, DebugCallContext argContext)
     {
-        //stub, optional
+        
     }
 
+    //create a feed entry - optional but recommended
     public virtual void FeedEntry(string argTitle, string argContent, FeedEntryType argType)
     {
-        //stub, optional (recommended)
+        
     }
 
+    //clear all feed entries - optional
     public virtual void ClearEntries()
     {
-        //stub, optional
+        
     }
 }
 

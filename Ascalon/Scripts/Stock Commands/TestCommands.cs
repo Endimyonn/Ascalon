@@ -126,4 +126,87 @@ public class TestCommands
     {
         argGameObject.result.transform.position += new Vector3(0, 5, 0);
     }
+
+    [ConVar("test_array", "Another test of ConVar array implementation")]
+    static ConVar cvar_test_array = new ConVar(new float[] { 5, 10, 15, 20, 21, 23 })
+    {
+        DataChanged = (object oldData, object newData) =>
+        {
+            Debug.Log("test_array has datachanged. old data: " + oldData + " | new data: " + newData);
+        }
+    };
+
+    [ConCommand("server_listconnections", "List all connected clients.", ConFlags.ServerOnly)]
+    static void cmd_server_listconnections()
+    {
+        string connectionsString = "";
+
+        foreach (KeyValuePair<int, Mirror.NetworkConnectionToClient> connection in Mirror.NetworkServer.connections)
+        {
+            connectionsString += "(" + connection.Key + ") " + connection.Value.address + "\n";
+        }
+
+        //remove trailing newline if there are any connections
+        if (connectionsString.Length > 0)
+        {
+            connectionsString = connectionsString.Substring(0, connectionsString.Length - 1);
+        }
+
+        DebugCore.FeedEntry("List of connected players: ", connectionsString, FeedEntryType.Info);
+    }
+
+    [ConCommand("test_rpcbroadcaster", ConFlags.ServerOnly | ConFlags.ClientReplicated)]
+    static void cmd_test_rpcbroadcaster(string argBroadcast)
+    {
+        DebugCore.FeedEntry(argBroadcast, FeedEntryType.Info);
+    }
+
+    [ConCommand("test_rpctoserver", ConFlags.RunOnServer)]
+    static void cmd_test_rpctoserver(string argBroadcast)
+    {
+        DebugCore.FeedEntry(argBroadcast);
+    }
+
+    [ConVar("test_repvar", "Replicated variable test", ConFlags.ClientReplicated | ConFlags.ServerOnly)]
+    static ConVar cvar_test_repvar = new ConVar(3981.23f);
+
+    [ConCommand("test_srvstatus")]
+    static void cmd_test_srvstatus()
+    {
+        //Mirror.NetworkServer.
+    }
+
+    [ConCommand("test_localplayer")]
+    static void cmd_test_localplayer()
+    {
+        Debug.Log("LocalPlayer is " + (Mirror.NetworkClient.localPlayer != null ? "not null" : "null"));
+    }
+
+    [ConCommand("test_cubethrow", ConFlags.RunOnServer | ConFlags.Cheat)]
+    static void cmd_test_cubethrow(float argStrength)
+    {
+        if (GameObject.Find("throwcube") == null)
+        {
+            DebugCore.FeedEntry("Couldn't find a valid cube to throw.", "No GameObject named 'throwcube' could be found.", FeedEntryType.Warning);
+        }
+
+        GameObject.Find("throwcube").GetComponent<Rigidbody>().AddForce(new Vector3(DebugCoreUtil.RandomFloatInRange(-0.4f, 0.4f), argStrength, DebugCoreUtil.RandomFloatInRange(-0.4f, 0.4f)), ForceMode.Impulse);
+    }
+
+    [ConCommand("test_combine", "Combines both players, Authority-style.", ConFlags.RunOnServer | ConFlags.Cheat)]
+    static void cmd_test_combine()
+    {
+        if (GameObject.Find("Bottom Half Player(Clone)") == null)
+        {
+            DebugCore.FeedEntry("Couldn't find the bottom half.", "GameObject.Find was null.", FeedEntryType.Error);
+        }
+
+        GameObject.Find("Bottom Half Player(Clone)").GetComponent<PlayerConnection>().Connect();
+    }
+
+    [ConCommand("test_clactive")]
+    static void cmd_test_clactive()
+    {
+        Debug.Log("NetworkClient is " + (Mirror.NetworkClient.active ? "active" : "inactive"));
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -129,7 +130,7 @@ public class DebugFeed : DebugUIModule
 
 
 
-    public override void OnCallComplete(string argCallString, bool argSuccess, DebugCallSource argSource)
+    public override void OnCallComplete(string argCallString, bool argSuccess, DebugCallContext argContext)
     {
         uiInputField.text = "";
     }
@@ -495,7 +496,7 @@ public class DebugFeed : DebugUIModule
 
     public void Call(string argInput)
     {
-        DebugCore.Call(argInput, DebugCallSource.User);
+        DebugCore.Call(argInput, new DebugCallContext(DebugCallSource.User));
     }
 
 
@@ -523,5 +524,51 @@ public class DebugFeed : DebugUIModule
     static void cmd_con_clear()
     {
         DebugCore.instance.debugUI.ClearEntries();
+    }
+}
+
+public partial class DebugCore
+{
+    public static void FeedEntry(string argTitle, string argContent, FeedEntryType argType)
+    {
+        if (instance.debugUI == null)
+        {
+            Console.WriteLine("FeedEntry > " + argTitle + "\nContent   > " + argContent + "\nType      > " + argType.ToString());
+            return;
+        }
+
+        instance.debugUI.FeedEntry(argTitle, argContent, argType);
+    }
+
+    public static void FeedEntry(string argTitle, FeedEntryType argType)
+    {
+        if (instance.debugUI == null)
+        {
+            Console.WriteLine("FeedEntry > " + argTitle + "\nType      > " + argType.ToString());
+            return;
+        }
+
+        instance.debugUI.FeedEntry(argTitle, "", argType);
+    }
+
+    public static void FeedEntry(string argTitle, string argContent)
+    {
+        if (instance.debugUI == null)
+        {
+            Console.WriteLine("FeedEntry > " + argTitle + "\nContent   > " + argContent);
+        }
+
+        instance.debugUI.FeedEntry(argTitle, argContent, FeedEntryType.Info);
+    }
+
+    public static void FeedEntry(string argTitle)
+    {
+        if (instance.debugUI == null)
+        {
+            Console.WriteLine("FeedEntry > " + argTitle);
+            return;
+        }
+
+        instance.debugUI.FeedEntry(argTitle, "", FeedEntryType.Info);
     }
 }

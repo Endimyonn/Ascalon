@@ -49,7 +49,7 @@ public class BaseCommands
         if (prefab != null)
         {
             DebugCore.FeedEntry("Spawning asset");
-            GameObject.Instantiate(prefab, ControlTools.MouseWorldPosition(), Quaternion.Euler(0, 0, 0));
+            GameObject.Instantiate(prefab, DebugCoreUtil.MouseWorldPosition(), Quaternion.Euler(0, 0, 0));
         }
         else
         {

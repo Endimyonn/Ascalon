@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 //This class defines several functions for command parameter
@@ -10,7 +11,6 @@ using UnityEngine;
 //it may be modified.
 public class BasicParameterParsers
 {
-    //todo: array version
     [DebugParameterParser("System.Boolean")]
     public static DebugParameterParseResult ParseBoolean(string argParameter, int argIndex)
     {
@@ -28,6 +28,44 @@ public class BasicParameterParsers
         {
             result.failureReason = InputParmValidationFailureReason.DataTypeMismatch;
             result.mismatchedParms.Add(new Tuple<string, string, int>(argParameter, "System.Boolean", argIndex));
+        }
+
+        return result;
+    }
+
+    [DebugParameterParser("System.Boolean[]")]
+    public static DebugParameterParseResult ParseBooleanArray(string argParameter, int argIndex)
+    {
+        DebugParameterParseResult result = new DebugParameterParseResult();
+
+        List<string> data = argParameter.Trim().Split('|').ToList();
+
+        List<bool> resultData = new List<bool>();
+
+        foreach (string arrayObject in data)
+        {
+            if (arrayObject == "")
+            {
+                continue;
+            }
+
+            //remove extra spaces
+            string trimmedObject = arrayObject.Trim();
+
+            if (trimmedObject == "1" || trimmedObject.ToLower() == "true" || trimmedObject.ToLower() == "yes")
+            {
+                resultData.Add(true);
+            }
+            else if (trimmedObject == "0" || trimmedObject.ToLower() == "false" || trimmedObject.ToLower() == "no")
+            {
+                resultData.Add(false);
+            }
+            else
+            {
+                result.success = false;
+                result.failureReason = InputParmValidationFailureReason.DataTypeMismatch;
+                result.mismatchedParms.Add(new Tuple<string, string, int>(argParameter, "System.Boolean", argIndex));
+            }
         }
 
         return result;
@@ -56,20 +94,27 @@ public class BasicParameterParsers
         return result;
     }
 
-    //todo: handle "3 | " without errors
     [DebugParameterParser("System.Single[]")]
     public static DebugParameterParseResult ParseFloatArray(string argParameter, int argIndex)
     {
         DebugParameterParseResult result = new DebugParameterParseResult();
 
         List<float> parseFloatArray = new List<float>();
-        string[] data = argParameter.Split('|');
+        string[] data = argParameter.Trim().Split('|');
 
         foreach (string arrayObject in data)
         {
+            if (arrayObject == "")
+            {
+                continue;
+            }
+
+            //remove extra spaces
+            string trimmedObject = arrayObject.Trim();
+
             float parseFloatCandidate;
             bool parseParm;
-            parseParm = float.TryParse(arrayObject, out parseFloatCandidate);
+            parseParm = float.TryParse(trimmedObject, out parseFloatCandidate);
 
             if (parseParm == true)
             {
@@ -88,7 +133,6 @@ public class BasicParameterParsers
         return result;
     }
 
-    //todo: array version
     [DebugParameterParser("System.Int32")]
     public static DebugParameterParseResult ParseInt32(string argParameter, int argIndex)
     {
@@ -123,7 +167,45 @@ public class BasicParameterParsers
         return result;
     }
 
-    //todo: array version
+    [DebugParameterParser("System.Int32[]")]
+    public static DebugParameterParseResult ParseInt32Array(string argParameter, int argIndex)
+    {
+        DebugParameterParseResult result = new DebugParameterParseResult();
+
+        List<int> parseIntArray = new List<int>();
+        string[] data = argParameter.Trim().Split('|');
+
+        foreach (string arrayObject in data)
+        {
+            if (arrayObject == "")
+            {
+                continue;
+            }
+
+            //remove extra spaces
+            string trimmedObject = arrayObject.Trim();
+
+            int parseIntCandidate;
+            bool parseParm;
+            parseParm = int.TryParse(trimmedObject, out parseIntCandidate);
+
+            if (parseParm == true)
+            {
+                parseIntArray.Add(parseIntCandidate);
+            }
+            else
+            {
+                result.success = false;
+                result.failureReason = InputParmValidationFailureReason.DataTypeMismatch;
+                result.mismatchedParms.Add(new Tuple<string, string, int>(argParameter, "System.Int32[]", argIndex));
+            }
+        }
+
+        result.result = parseIntArray.ToArray();
+
+        return result;
+    }
+
     [DebugParameterParser("System.Double")]
     public static DebugParameterParseResult ParseDouble(string argParameter, int argIndex)
     {
@@ -147,6 +229,45 @@ public class BasicParameterParsers
         return result;
     }
 
+    [DebugParameterParser("System.Double[]")]
+    public static DebugParameterParseResult ParseDoubleArray(string argParameter, int argIndex)
+    {
+        DebugParameterParseResult result = new DebugParameterParseResult();
+
+        List<double> parseDoubleArray = new List<double>();
+        string[] data = argParameter.Trim().Split('|');
+
+        foreach (string arrayObject in data)
+        {
+            if (arrayObject == "")
+            {
+                continue;
+            }
+
+            //remove extra spaces
+            string trimmedObject = arrayObject.Trim();
+
+            double parseDoubleCandidate;
+            bool parseParm;
+            parseParm = double.TryParse(trimmedObject, out parseDoubleCandidate);
+
+            if (parseParm == true)
+            {
+                parseDoubleArray.Add(parseDoubleCandidate);
+            }
+            else
+            {
+                result.success = false;
+                result.failureReason = InputParmValidationFailureReason.DataTypeMismatch;
+                result.mismatchedParms.Add(new Tuple<string, string, int>(argParameter, "System.Double[]", argIndex));
+            }
+        }
+
+        result.result = parseDoubleArray.ToArray();
+
+        return result;
+    }
+
     [DebugParameterParser("System.String")]
     public static DebugParameterParseResult ParseString(string argParameter, int argIndex)
     {
@@ -158,13 +279,24 @@ public class BasicParameterParsers
     }
 
     //todo: create test case
-    //todo: handle "afei | " without errors
     [DebugParameterParser("System.String[]")]
     public static DebugParameterParseResult ParseStringArray(string argParameter, int argIndex)
     {
         DebugParameterParseResult result = new DebugParameterParseResult();
 
-        result.result = argParameter.Split('|');
+        List<string> data = argParameter.Split('|').ToList();
+
+        List<string> correctedData = new List<string>();
+
+        foreach (string arrayObject in data)
+        {
+            if (arrayObject != "")
+            {
+                correctedData.Add(arrayObject);
+            }
+        }
+
+        result.result = correctedData.ToArray();
 
         return result;
     }

@@ -110,7 +110,7 @@ public class ConRelCommands
     [ConVar("client_allowservercall", "Allows the server to send non-standard calls to the player", ConFlags.LockWhileConnected | ConFlags.Save)]
     static ConVar cvar_client_allowservercall = new ConVar(false);
 
-    [ConVar("host_cheats", "Determines whether commands and ConVars marked\nas cheats may be used")]
+    [ConVar("server_cheats", "Determines whether commands and ConVars marked\nas cheats may be used", ConFlags.ClientReplicated | ConFlags.NotifyClients)]
     static ConVar cvar_host_cheats = new ConVar(false);
 
     [ConCommand("client_writeconfig", "Write a configuration file with the specified name")]

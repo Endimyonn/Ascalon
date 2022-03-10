@@ -39,6 +39,7 @@ public class DebugConfigTools
         );
     }
 
+    //Write a config in the persistent data path
     public static void WriteConfigUnity(string argFileName)
     {
         //ensure config directory exists
@@ -69,7 +70,7 @@ public class DebugConfigTools
             {
                 if (line.Length > 0 && line.Substring(0, 2) != "//") //filter blank lines and comments
                 {
-                    DebugCore.Call(line, DebugCallSource.Internal);
+                    DebugCore.Call(line, new DebugCallContext(DebugCallSource.Internal));
                 }
             }
         }
@@ -80,8 +81,19 @@ public class DebugConfigTools
         ReadConfig(argPath, false);
     }
 
+    //Read a config from the persistent data path
     public static void ReadConfigUnity(string argFileName)
     {
         ReadConfig(Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argFileName + ".cfg");
+    }
+
+    public static bool ConfigExists(string argPath)
+    {
+        return File.Exists(argPath);
+    }
+
+    public static bool ConfigExistsUnity(string argFileName)
+    {
+        return ConfigExists(Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argFileName + ".cfg");
     }
 }

@@ -18,7 +18,7 @@ using TMPro;
 //in operation. It is designed in such a manner as to be easily implemented into
 //any project with little to no modification.
 
-//By design, the console front-end is made to be enabled and visibleby default. the
+//By design, the console front-end is made to be enabled and visible by default. the
 //implementation of toggling is done on a per-project basis, and no input systems
 //aside from Unity's own EventSystem (for text entry frontend) are used.
 
@@ -34,9 +34,14 @@ public partial class DebugCore : MonoBehaviour
     //networking module
     public DebugNetModule debugNet;
 
+    //default config info
+    public string mainConfigName = "config";
+    public string mainConfigDirectory = "";
+    public bool loadConfigUnityStyle = false;
+
 
     //delegates
-    public delegate void OnCallCompleted(string argCallString, bool argSuccess, DebugCallSource argSource);
+    public delegate void OnCallCompleted(string argCallString, bool argSuccess, DebugCallContext argContext);
     public OnCallCompleted onCallCompleted;
     
 
@@ -62,6 +67,7 @@ public partial class DebugCore : MonoBehaviour
         //singleton logic
         if (instance)
         {
+            Debug.Log("destroying duplicate debugcore");
             Destroy(transform.root.gameObject);
         }
         else
@@ -127,18 +133,14 @@ public partial class DebugCore : MonoBehaviour
             gatherTime.Milliseconds / 10));*/
 
         //load config
-        //todo: better system for raw C# implementations
-        DebugConfigTools.ReadConfigUnity("config");
-    }
-
-    private void Update()
-    {
-        
-    }
-
-    private void LateUpdate()
-    {
-        
+        if (!loadConfigUnityStyle)
+        {
+            DebugConfigTools.ReadConfig(mainConfigDirectory + mainConfigName);
+        }
+        else
+        {
+            DebugConfigTools.ReadConfigUnity(mainConfigName);
+        }
     }
 
 
@@ -149,7 +151,7 @@ public partial class DebugCore : MonoBehaviour
 
 
 
-    public static void Call(string argInput, DebugCallSource argSource)
+    public static void Call(string argInput, DebugCallContext argContext)
     {
         //make sure we have a command to work with
         if (argInput == null || argInput == "")
@@ -174,7 +176,12 @@ public partial class DebugCore : MonoBehaviour
         if (!instance.conCommands.Any(ConCommand => ConCommand.name == inputName) && !instance.conVars.Any(ConVarInstance => ConVarInstance.name == inputName))
         {
             FeedEntry("Error: no such command or ConVar '" + inputName.ToLower() + "'", "The command or ConVar entered does not exist.\nOriginal received string: " + argInput, FeedEntryType.Error);
-            instance.onCallCompleted(argInput, false, argSource);
+
+            //callback
+            if (instance.onCallCompleted != null)
+            {
+                instance.onCallCompleted(argInput, false, argContext);
+            }
         }
         else
         {
@@ -207,8 +214,8 @@ public partial class DebugCore : MonoBehaviour
             }
 
             //check ConFlags and context before proceeding
-            bool flagsPassed = DebugCore.instance.ValidateFlags(findConObject.flags);
-            bool contextPassed = DebugCore.instance.ValidateContext(argSource, findConObject.flags);
+            bool flagsPassed = DebugCore.instance.ValidateFlags(argContext, findConObject.flags);
+            bool contextPassed = DebugCore.instance.ValidateContext(argContext, findConObject.flags);
 
 
 
@@ -217,30 +224,45 @@ public partial class DebugCore : MonoBehaviour
             {
                 if (flagsPassed && contextPassed)
                 {
-                    object[] finalParms = inputValidity.finalParms.ToArray();
-
-                    if (workingWith == 1) //ConCommand
+                    //send call to server if it is marked to be ran on server
+                    if (findConObject.flags.HasFlag(ConFlags.RunOnServer) && DebugNetModule.GetRole() != NetRole.Server)
                     {
-                        findCommand.method.Invoke(null, finalParms);
-
-                        if (instance.onCallCompleted != null)
-                        {
-                            instance.onCallCompleted(argInput, true, argSource);
-                        }
+                        Debug.Log("client sending call to server!" + argInput);
+                        instance.debugNet.NetCall(argInput, new DebugCallContext(DebugNetModule.GetRole()), new DebugCallNetTarget(NetRole.Server));
+                        return;
                     }
-                    else if (workingWith == 2) //ConVar
+                    else //run locally
                     {
-                        findConVar.SetData(finalParms);
+                        object[] finalParms = inputValidity.finalParms.ToArray();
 
+                        if (workingWith == 1) //ConCommand
+                        {
+                            findCommand.method.Invoke(null, finalParms);
+                        }
+                        else if (workingWith == 2) //ConVar
+                        {
+                            findConVar.SetData(finalParms);
+                        }
+
+                        //if the call was a replicated object, replicate it on all clients
+                        if (findConObject.flags.HasFlag(ConFlags.ClientReplicated) && DebugNetModule.GetRole() == NetRole.Server)
+                        {
+                            instance.debugNet.SendReplicatedToAllClients(argInput, new DebugCallContext(DebugCallSource.Server));
+                        }
+
+                        //run callback
                         if (instance.onCallCompleted != null)
                         {
-                            instance.onCallCompleted(argInput, true, argSource);
+                            instance.onCallCompleted(argInput, true, argContext);
                         }
                     }
                 }
                 else
                 {
-                    instance.onCallCompleted(argInput, false, argSource);
+                    if (instance.onCallCompleted != null)
+                    {
+                        instance.onCallCompleted(argInput, false, argContext);
+                    }
                 }
             }
             else //parameter(s) did not parse correctly
@@ -248,7 +270,7 @@ public partial class DebugCore : MonoBehaviour
                 switch (inputValidity.failureReason)
                 {
                     case InputParmValidationFailureReason.ParmCountMismatch:
-                        DebugCore.FeedEntry("Error: incorrect number of arguments provided", "The number of arguments provided does not match the number expected for the command or ConVar.\nExpected: " + (findCommand.name != null ? findCommand.parms.Length : "1") + "\nProvided: " + inputParms.Length, FeedEntryType.Error);
+                        DebugCore.FeedEntry("Error: incorrect number of arguments provided", "The number of arguments provided does not match the number expected for the command or ConVar.\nExpected: " + (findCommand.name != null ? findCommand.parms.Length.ToString() : "1") + "\nProvided: " + inputParms.Length, FeedEntryType.Error);
                         break;
 
                     case InputParmValidationFailureReason.DataTypeMismatch:
@@ -278,7 +300,7 @@ public partial class DebugCore : MonoBehaviour
 
                 if (instance.onCallCompleted != null) //callback
                 {
-                    instance.onCallCompleted(argInput, false, argSource);
+                    instance.onCallCompleted(argInput, false, argContext);
                 }
             }
         }
@@ -287,10 +309,13 @@ public partial class DebugCore : MonoBehaviour
     //if we receive a call without a specified source, assume it's internal
     public static void Call(string argString)
     {
-        DebugCore.Call(argString, DebugCallSource.Internal);
+        DebugCallContext context = new DebugCallContext();
+        context.source = DebugCallSource.Internal;
+
+        DebugCore.Call(argString, context);
     }
 
-    List<string> GetInputParms(string argInput) //todo: array support formatted as {x|x}
+    List<string> GetInputParms(string argInput)
     {
         List<string> returnList = new List<string>();
         CommandParmScrubState scrubState = CommandParmScrubState.Initial;
@@ -425,11 +450,12 @@ public partial class DebugCore : MonoBehaviour
     }
 
     //validate flags on a call
-    bool ValidateFlags(ConFlags argFlags)
+    bool ValidateFlags(DebugCallContext argContext, ConFlags argFlags)
     {
         if (argFlags.HasFlag(ConFlags.Cheat))
         {
-            if ((bool)DebugCore.GetConVar("host_cheats") == false)
+            //don't call if cheats are disabled
+            if ((bool)DebugCore.GetConVar("server_cheats") == false)
             {
                 return false;
             }
@@ -437,16 +463,49 @@ public partial class DebugCore : MonoBehaviour
 
         if (argFlags.HasFlag(ConFlags.ServerOnly))
         {
-            if (debugNet.isClient)
+            //don't call if we are not the server
+            if (DebugNetModule.GetRole() != NetRole.Server)
             {
+
+                if (argContext.source == DebugCallSource.Server)
+                {
+                    //if it's ClientReplicated, we can do it still
+                    if (!argFlags.HasFlag(ConFlags.ClientReplicated))
+                    {
+                        DebugCore.FeedEntry("You do not have permission for this.", FeedEntryType.WarningVerbose);
+                        return false;
+                    }
+                }
+                else
+                {
+                    DebugCore.FeedEntry("You do not have permission for this.", FeedEntryType.WarningVerbose);
+                    return false;
+                }
+            }
+
+            //don't call if this came from a client call
+            if (argContext.source == DebugCallSource.Client)
+            {
+                DebugCore.FeedEntry("This command or ConVar may only be run by the server.", FeedEntryType.WarningVerbose);
                 return false;
             }
         }
 
         if (argFlags.HasFlag(ConFlags.LockWhileConnected))
         {
-            if (debugNet.sessionActive)
+            //don't call if we are in a network session
+            if (DebugNetModule.GetRole() != NetRole.Inactive)
             {
+                return false;
+            }
+        }
+
+        if (argContext.source == DebugCallSource.RCon)
+        {
+            //don't call if RCon is disabled on this command or ConVar
+            if (argFlags.HasFlag(ConFlags.NoRCon))
+            {
+                DebugCore.FeedEntry("RCon call was made for command or ConVar that disallows RCon.", FeedEntryType.WarningVerbose);
                 return false;
             }
         }
@@ -455,20 +514,26 @@ public partial class DebugCore : MonoBehaviour
     }
 
     //validate context on a call
-    bool ValidateContext(DebugCallSource argContext, ConFlags argFlags)
+    bool ValidateContext(DebugCallContext argContext, ConFlags argFlags)
     {
-        if (argContext == DebugCallSource.Internal)
+        if (argContext.source == DebugCallSource.Internal)
         {
             return true;
         }
         
-        if (argContext == DebugCallSource.User)
+        if (argContext.source == DebugCallSource.User)
         {
             return true;
         }
 
-        if (argContext == DebugCallSource.Client)
+        if (argContext.source == DebugCallSource.Client)
         {
+            //server should always accept client calls
+            if (debugNet.role == NetRole.Server)
+            {
+                return true;
+            }
+
             if ((bool)DebugCore.GetConVar("client_allowclientcall") == true)
             {
                 return true;
@@ -477,7 +542,7 @@ public partial class DebugCore : MonoBehaviour
             return false;
         }
 
-        if (argContext == DebugCallSource.Server)
+        if (argContext.source == DebugCallSource.Server)
         {
             if (argFlags.HasFlag(ConFlags.ClientReplicated))
             {
@@ -517,7 +582,7 @@ public partial class DebugCore : MonoBehaviour
 
 
 
-    public static object GetConVar(string argConVarName) //todo: custom struct or tuple with bool and object for better nullreference handling
+    public static object GetConVar(string argConVarName) //todo: custom struct or tuple with bool and object for better nullreference handling?
     {
         return DebugCore.instance.conVars.FirstOrDefault(ConVar => ConVar.name == argConVarName).GetData();
     }
@@ -551,59 +616,15 @@ public partial class DebugCore : MonoBehaviour
     {
         return (ConCommandExists(argEntryName) == true || ConVarExists(argEntryName) == true);
     }
-
-
-
-
-
-
-
-
-
-    //DebugUIModule extensions
-    public static void FeedEntry(string argTitle, string argContent, FeedEntryType argType)
-    {
-        if (instance.debugUI == null)
-        {
-            Console.WriteLine("FeedEntry > " + argTitle + "\nContent   > " + argContent + "\nType      > " + argType.ToString());
-            return;
-        }
-
-        instance.debugUI.FeedEntry(argTitle, argContent, argType);
-    }
-
-    public static void FeedEntry(string argTitle, FeedEntryType argType)
-    {
-        if (instance.debugUI == null)
-        {
-            Console.WriteLine("FeedEntry > " + argTitle + "\nType      > " + argType.ToString());
-            return;
-        }
-
-        instance.debugUI.FeedEntry(argTitle, "", argType);
-    }
-
-    public static void FeedEntry(string argTitle, string argContent)
-    {
-        if (instance.debugUI == null)
-        {
-            Console.WriteLine("FeedEntry > " + argTitle + "\nContent   > " + argContent);
-        }
-
-        instance.debugUI.FeedEntry(argTitle, argContent, FeedEntryType.Info);
-    }
-
-    public static void FeedEntry(string argTitle)
-    {
-        if (instance.debugUI == null)
-        {
-            Console.WriteLine("FeedEntry > " + argTitle);
-            return;
-        }
-
-        instance.debugUI.FeedEntry(argTitle, "", FeedEntryType.Info);
-    }
 }
+
+
+
+
+
+
+
+
 
 //container to hold everything the console needs to work with commands and display info to the visual console
 public struct ConCommand
@@ -643,6 +664,38 @@ public enum DebugCallSource
     User,     //from user input (eg a console frontend)
     Client,   //from another client in the server - treat with caution!
     Server,   //from the server
+    RCon      //from an RCon client
+}
+
+[System.Serializable]
+public struct DebugCallContext
+{
+    public DebugCallSource source;  //basic source info
+    public string clientName;       //if call came from another client
+
+    public DebugCallContext(DebugCallSource argSource, string argClientName = "")
+    {
+        source = argSource;
+        clientName = argClientName;
+    }
+
+    public DebugCallContext(NetRole argSource, string argClientName = "")
+    {
+        if (argSource == NetRole.Client)
+        {
+            source = DebugCallSource.Client;
+        }
+        else if (argSource == NetRole.Server)
+        {
+            source = DebugCallSource.Server;
+        }
+        else //assume the call is internal otherwise
+        {
+            source = DebugCallSource.Internal;
+        }
+
+        clientName = argClientName;
+    }
 }
 
 //todo: figure out extensible way to implement this. string?

@@ -65,7 +65,34 @@ public class DebugCoreUtil
         else
         {
             returnValue = argConVarData.ToString();
+
+            if (dataType == "System.String")
+            {
+                returnValue = "\"" + returnValue + "\"";
+            }
         }
+
         return returnValue;
+    }
+
+    public static Vector3 MouseWorldPosition()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 150f))
+        {
+            return hit.point;
+        }
+        else
+        {
+            return new Vector3(0f, 0f, 0f);
+        }
+    }
+
+    public static float RandomFloatInRange(float argMin, float argMax)
+    {
+        System.Random rando = new System.Random();
+
+        return (float)(rando.NextDouble() * (argMax - argMin) + argMin);
     }
 }
