@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class ParameterGameObjectFinder
 {
-    [DebugParameterParser("GameObjectFinder")]
-    public static DebugParameterParseResult ParseGameObjectFinder(string argParameter, int argIndex)
+    [AscalonParameterParser("GameObjectFinder")]
+    public static AscalonParameterParseResult ParseGameObjectFinder(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         if (argParameter.ToLower() == "mouseposition" || argParameter.ToLower() == "mousepos" || argParameter.ToLower() == "mpos")
         {

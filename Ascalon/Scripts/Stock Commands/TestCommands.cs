@@ -9,19 +9,19 @@ public class TestCommands
     [ConCommand("test_testerfunc", "command testing command")]
     static void cmd_test_testerfunc()
     {
-        DebugCore.FeedEntry("tester", "this is\na test command!\nif you see this, it worked", FeedEntryType.Info);
+        Ascalon.Log("tester", "this is\na test command!\nif you see this, it worked", LogMode.Info);
     }
 
     [ConCommand("test_testerfunc2", "command testing command with args for testing args")]
     static void cmd_test_testerfunc2(string argText, string argText2)
     {
-        DebugCore.FeedEntry("TesterFunc2 called", "arg 1: " + argText + "\narg 2: " + argText2, FeedEntryType.Info);
+        Ascalon.Log("TesterFunc2 called", "arg 1: " + argText + "\narg 2: " + argText2, LogMode.Info);
     }
 
     [ConCommand("test_testerfunc3", "command testing command for command validity checking testing")]
     static void cmd_test_testerfunc3(float argFloatIn, int argIntIn)
     {
-        DebugCore.FeedEntry("TesterFunc3 called", "Result of the two args: " + argIntIn * argFloatIn, FeedEntryType.Info);
+        Ascalon.Log("TesterFunc3 called", "Result of the two args: " + argIntIn * argFloatIn, LogMode.Info);
     }
 
     [ConCommand("test_testerfunc4", "command testing command for bools")]
@@ -29,24 +29,24 @@ public class TestCommands
     {
         if (argBool == true)
         {
-            DebugCore.FeedEntry("TesterFunc4 called", "Received a bool of true", FeedEntryType.Info);
+            Ascalon.Log("TesterFunc4 called", "Received a bool of true", LogMode.Info);
         }
         else
         {
-            DebugCore.FeedEntry("TesterFunc4 called", "Received a bool of false", FeedEntryType.Info);
+            Ascalon.Log("TesterFunc4 called", "Received a bool of false", LogMode.Info);
         }
     }
 
     [ConCommand("obj_moveupgive", "Dummy command for alphabetical suggestion testing")]
     static void cmd_obj_moveupgive()
     {
-        DebugCore.FeedEntry("This is a dummy command", "", FeedEntryType.Info);
+        Ascalon.Log("This is a dummy command", "", LogMode.Info);
     }
 
     [ConCommand("obj_moveupbive", "Dummy command for alphabetical suggestion testing")]
     static void cmd_obj_moveupbive()
     {
-        DebugCore.FeedEntry("This is a dummy command", "", FeedEntryType.Info);
+        Ascalon.Log("This is a dummy command", "", LogMode.Info);
     }
 
     [ConVar("test_testervar1", "Test of ConVar implementation")]
@@ -89,7 +89,7 @@ public class TestCommands
     [ConCommand("test_testerfunc5", "Testing command for testing ConVar accessing")]
     static void cmd_test_testerfunc5()
     {
-        Debug.Log("The value of test_testervar1 is: " + DebugCore.GetConVar("test_testervar1"));
+        Debug.Log("The value of test_testervar1 is: " + Ascalon.GetConVar("test_testervar1"));
     }
 
     [ConVar("test_testervar5", "Test of ConFlag.Save", ConFlags.Save)]
@@ -111,11 +111,11 @@ public class TestCommands
         {
             if ((float)newData > 99.5f)
             {
-                DebugCore.SetConVar("test_clampvar", 99.5f);
+                Ascalon.SetConVar("test_clampvar", 99.5f);
             }
             else if ((float)newData < 20.5f)
             {
-                DebugCore.SetConVar("test_clampvar", 20.5f);
+                Ascalon.SetConVar("test_clampvar", 20.5f);
             }
         }
 
@@ -152,19 +152,19 @@ public class TestCommands
             connectionsString = connectionsString.Substring(0, connectionsString.Length - 1);
         }
 
-        DebugCore.FeedEntry("List of connected players: ", connectionsString, FeedEntryType.Info);
+        Ascalon.Log("List of connected players: ", connectionsString, LogMode.Info);
     }
 
     [ConCommand("test_rpcbroadcaster", ConFlags.ServerOnly | ConFlags.ClientReplicated)]
     static void cmd_test_rpcbroadcaster(string argBroadcast)
     {
-        DebugCore.FeedEntry(argBroadcast, FeedEntryType.Info);
+        Ascalon.Log(argBroadcast, LogMode.Info);
     }
 
     [ConCommand("test_rpctoserver", ConFlags.RunOnServer)]
     static void cmd_test_rpctoserver(string argBroadcast)
     {
-        DebugCore.FeedEntry(argBroadcast);
+        Ascalon.Log(argBroadcast);
     }
 
     [ConVar("test_repvar", "Replicated variable test", ConFlags.ClientReplicated | ConFlags.ServerOnly)]
@@ -187,10 +187,10 @@ public class TestCommands
     {
         if (GameObject.Find("throwcube") == null)
         {
-            DebugCore.FeedEntry("Couldn't find a valid cube to throw.", "No GameObject named 'throwcube' could be found.", FeedEntryType.Warning);
+            Ascalon.Log("Couldn't find a valid cube to throw.", "No GameObject named 'throwcube' could be found.", LogMode.Warning);
         }
 
-        GameObject.Find("throwcube").GetComponent<Rigidbody>().AddForce(new Vector3(DebugCoreUtil.RandomFloatInRange(-0.4f, 0.4f), argStrength, DebugCoreUtil.RandomFloatInRange(-0.4f, 0.4f)), ForceMode.Impulse);
+        GameObject.Find("throwcube").GetComponent<Rigidbody>().AddForce(new Vector3(AscalonUtil.RandomFloatInRange(-0.4f, 0.4f), argStrength, AscalonUtil.RandomFloatInRange(-0.4f, 0.4f)), ForceMode.Impulse);
     }
 
     [ConCommand("test_combine", "Combines both players, Authority-style.", ConFlags.RunOnServer | ConFlags.Cheat)]
@@ -198,7 +198,7 @@ public class TestCommands
     {
         if (GameObject.Find("Bottom Half Player(Clone)") == null)
         {
-            DebugCore.FeedEntry("Couldn't find the bottom half.", "GameObject.Find was null.", FeedEntryType.Error);
+            Ascalon.Log("Couldn't find the bottom half.", "GameObject.Find was null.", LogMode.Error);
         }
 
         GameObject.Find("Bottom Half Player(Clone)").GetComponent<PlayerConnection>().Connect();

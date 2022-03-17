@@ -11,10 +11,10 @@ using UnityEngine;
 //it may be modified.
 public class BasicParameterParsers
 {
-    [DebugParameterParser("System.Boolean")]
-    public static DebugParameterParseResult ParseBoolean(string argParameter, int argIndex)
+    [AscalonParameterParser("System.Boolean")]
+    public static AscalonParameterParseResult ParseBoolean(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         if (argParameter == "1" || argParameter.ToLower() == "true" || argParameter.ToLower() == "yes")
         {
@@ -33,10 +33,10 @@ public class BasicParameterParsers
         return result;
     }
 
-    [DebugParameterParser("System.Boolean[]")]
-    public static DebugParameterParseResult ParseBooleanArray(string argParameter, int argIndex)
+    [AscalonParameterParser("System.Boolean[]")]
+    public static AscalonParameterParseResult ParseBooleanArray(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         List<string> data = argParameter.Trim().Split('|').ToList();
 
@@ -71,10 +71,10 @@ public class BasicParameterParsers
         return result;
     }
 
-    [DebugParameterParser("System.Single")]
-    public static DebugParameterParseResult ParseFloat(string argParameter, int argIndex)
+    [AscalonParameterParser("System.Single")]
+    public static AscalonParameterParseResult ParseFloat(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         float parseFloat;
         bool parseParm;
@@ -94,10 +94,10 @@ public class BasicParameterParsers
         return result;
     }
 
-    [DebugParameterParser("System.Single[]")]
-    public static DebugParameterParseResult ParseFloatArray(string argParameter, int argIndex)
+    [AscalonParameterParser("System.Single[]")]
+    public static AscalonParameterParseResult ParseFloatArray(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         List<float> parseFloatArray = new List<float>();
         string[] data = argParameter.Trim().Split('|');
@@ -133,10 +133,10 @@ public class BasicParameterParsers
         return result;
     }
 
-    [DebugParameterParser("System.Int32")]
-    public static DebugParameterParseResult ParseInt32(string argParameter, int argIndex)
+    [AscalonParameterParser("System.Int32")]
+    public static AscalonParameterParseResult ParseInt32(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         int parseInt;
         bool parseParm;
@@ -167,10 +167,10 @@ public class BasicParameterParsers
         return result;
     }
 
-    [DebugParameterParser("System.Int32[]")]
-    public static DebugParameterParseResult ParseInt32Array(string argParameter, int argIndex)
+    [AscalonParameterParser("System.Int32[]")]
+    public static AscalonParameterParseResult ParseInt32Array(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         List<int> parseIntArray = new List<int>();
         string[] data = argParameter.Trim().Split('|');
@@ -206,10 +206,10 @@ public class BasicParameterParsers
         return result;
     }
 
-    [DebugParameterParser("System.Double")]
-    public static DebugParameterParseResult ParseDouble(string argParameter, int argIndex)
+    [AscalonParameterParser("System.Double")]
+    public static AscalonParameterParseResult ParseDouble(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         double parseDouble;
         bool parseParm;
@@ -229,10 +229,10 @@ public class BasicParameterParsers
         return result;
     }
 
-    [DebugParameterParser("System.Double[]")]
-    public static DebugParameterParseResult ParseDoubleArray(string argParameter, int argIndex)
+    [AscalonParameterParser("System.Double[]")]
+    public static AscalonParameterParseResult ParseDoubleArray(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         List<double> parseDoubleArray = new List<double>();
         string[] data = argParameter.Trim().Split('|');
@@ -268,10 +268,10 @@ public class BasicParameterParsers
         return result;
     }
 
-    [DebugParameterParser("System.String")]
-    public static DebugParameterParseResult ParseString(string argParameter, int argIndex)
+    [AscalonParameterParser("System.String")]
+    public static AscalonParameterParseResult ParseString(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         result.result = argParameter;
 
@@ -279,10 +279,10 @@ public class BasicParameterParsers
     }
 
     //todo: create test case
-    [DebugParameterParser("System.String[]")]
-    public static DebugParameterParseResult ParseStringArray(string argParameter, int argIndex)
+    [AscalonParameterParser("System.String[]")]
+    public static AscalonParameterParseResult ParseStringArray(string argParameter, int argIndex)
     {
-        DebugParameterParseResult result = new DebugParameterParseResult();
+        AscalonParameterParseResult result = new AscalonParameterParseResult();
 
         List<string> data = argParameter.Split('|').ToList();
 

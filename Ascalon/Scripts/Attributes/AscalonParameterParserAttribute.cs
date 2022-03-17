@@ -5,11 +5,11 @@ using UnityEngine;
 //Attribute class for debug parameter parsers. All custom parsers
 //should be tagged with this attribute, and initialized using their
 //type-string.
-public class DebugParameterParserAttribute : System.Attribute
+public class AscalonParameterParserAttribute : System.Attribute
 {
     public string typeName;
 
-    public DebugParameterParserAttribute(string argTypeName)
+    public AscalonParameterParserAttribute(string argTypeName)
     {
         typeName = argTypeName;
     }

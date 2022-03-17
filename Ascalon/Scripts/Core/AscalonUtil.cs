@@ -6,7 +6,7 @@ using System;
 using UnityEngine;
 
 //todo: merge into main class?
-public class DebugCoreUtil
+public class AscalonUtil
 {
     //Convert parms to strings
     public static string[] ParmsToStrings(ParameterInfo[] argInputParms)

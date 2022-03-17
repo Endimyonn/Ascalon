@@ -1,12 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine;
+#endif
 
 //Tools for writing and reading config files formatted for DebugCore
 
-public class DebugConfigTools
+public class AscalonConfigTools
 {
     public static async void WriteConfig(string argPath)
     {
@@ -15,11 +19,11 @@ public class DebugConfigTools
             //first, prepare the config string
             string cfgString = "";
 
-            foreach (ConVar conVar in DebugCore.instance.conVars)
+            foreach (ConVar conVar in Ascalon.instance.conVars)
             {
                 if (conVar.flags.HasFlag(ConFlags.Save))
                 {
-                    cfgString += conVar.name + " " + DebugCoreUtil.ConVarDataToString(conVar.GetData()) + "\n";
+                    cfgString += conVar.name + " " + AscalonUtil.ConVarDataToString(conVar.GetData()) + "\n";
                 }
             }
 
@@ -42,6 +46,7 @@ public class DebugConfigTools
     //Write a config in the persistent data path
     public static void WriteConfigUnity(string argFileName)
     {
+        #if UNITY_2019_1_OR_NEWER
         //ensure config directory exists
         if (!Directory.Exists(Application.persistentDataPath + Path.DirectorySeparatorChar + "config"))
         {
@@ -49,6 +54,9 @@ public class DebugConfigTools
         }
 
         WriteConfig(Application.persistentDataPath + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
+        #else
+        Ascalon.Log("Cannot write a config Unity-style outside of Unity!", LogType.Error);
+        #endif
     }
 
     public static void ReadConfig(string argPath, bool argSilent)
@@ -58,7 +66,15 @@ public class DebugConfigTools
         {
             if (!argSilent)
             {
-                DebugCore.FeedEntry("Configuration file not found.", "File \"" + argPath + "\" does not exist.", FeedEntryType.Warning);
+                if (Ascalon.instance.ready)
+                {
+                    Ascalon.Log("Configuration file not found.", "File \"" + argPath + "\" does not exist.", LogMode.Warning);
+                }
+                else
+                {
+                    Console.WriteLine("Configuration file not found. File \"" + argPath + "\" does not exist.");
+                }
+                
             }
             return;
         }
@@ -70,7 +86,7 @@ public class DebugConfigTools
             {
                 if (line.Length > 0 && line.Substring(0, 2) != "//") //filter blank lines and comments
                 {
-                    DebugCore.Call(line, new DebugCallContext(DebugCallSource.Internal));
+                    Ascalon.Call(line, new AscalonCallContext(AscalonCallSource.Internal));
                 }
             }
         }

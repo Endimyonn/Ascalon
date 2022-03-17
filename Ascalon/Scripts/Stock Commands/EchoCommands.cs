@@ -9,31 +9,31 @@ public class EchoCommands
     [ConCommand("con_echo", "Log a specified string")]
     static void cmd_con_echo(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.Info);
+        Ascalon.Log(argTitle, "", LogMode.Info);
     }
 
     [ConCommand("con_echowarning", "Log a specified string as a warning")]
     static void cmd_con_echowarning(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.Warning);
+        Ascalon.Log(argTitle, "", LogMode.Warning);
     }
 
     [ConCommand("con_echoerror", "Log a specified string as an error")]
     static void cmd_con_echoerror(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.Error);
+        Ascalon.Log(argTitle, "", LogMode.Error);
     }
 
     [ConCommand("con_echoassertion", "Log a specified string as an assertion")]
     static void cmd_con_echoassertion(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.Assertion);
+        Ascalon.Log(argTitle, "", LogMode.Assertion);
     }
 
     [ConCommand("con_echoexception", "Log a specified string as an exception")]
     static void cmd_con_echoexception(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.Exception);
+        Ascalon.Log(argTitle, "", LogMode.Exception);
     }
 
 
@@ -41,30 +41,30 @@ public class EchoCommands
     [ConCommand("con_echoverbose", "Log a specified string (verbose)")]
     static void cmd_con_echoverbose(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.InfoVerbose);
+        Ascalon.Log(argTitle, "", LogMode.InfoVerbose);
     }
 
     [ConCommand("con_echowarningverbose", "Log a specified string as a warning (verbose)")]
     static void cmd_con_echowarningverbose(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.WarningVerbose);
+        Ascalon.Log(argTitle, "", LogMode.WarningVerbose);
     }
 
     [ConCommand("con_echoerrorverbose", "Log a specified string as an error (verbose)")]
     static void cmd_con_echoerrorverbose(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.ErrorVerbose);
+        Ascalon.Log(argTitle, "", LogMode.ErrorVerbose);
     }
 
     [ConCommand("con_echoassertionverbose", "Log a specified string as an assertion (verbose)")]
     static void cmd_con_echoassertionverbose(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.AssertionVerbose);
+        Ascalon.Log(argTitle, "", LogMode.AssertionVerbose);
     }
 
     [ConCommand("con_echoexceptionverbose", "Log a specified string as an exception (verbose)")]
     static void cmd_con_echoexceptionverbose(string argTitle)
     {
-        DebugCore.FeedEntry(argTitle, "", FeedEntryType.ExceptionVerbose);
+        Ascalon.Log(argTitle, "", LogMode.ExceptionVerbose);
     }
 }

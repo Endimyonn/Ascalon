@@ -10,7 +10,7 @@ public class BaseCommands
     [ConCommand("game_changelevel", "Load a specified scene.")]
     static void cmd_game_changelevel(string argScene)
     {
-        DebugCore.FeedEntry("Loading scene: " + argScene, "", FeedEntryType.Info);
+        Ascalon.Log("Loading scene: " + argScene, "", LogMode.Info);
         SceneManager.LoadScene(argScene);
     }
 
@@ -23,7 +23,7 @@ public class BaseCommands
     [ConCommand("game_reloadlevel", "Reload the current scene.")]
     static void cmd_game_reloadlevel()
     {
-        DebugCore.FeedEntry("Reloading scene", "", FeedEntryType.Info);
+        Ascalon.Log("Reloading scene", "", LogMode.Info);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -31,13 +31,13 @@ public class BaseCommands
     [ConCommand("game_reloadscene", "Reload the current scene")]
     static void cmd_game_reloadscene()
     {
-        DebugCore.Call("game_reloadlevel");
+        Ascalon.Call("game_reloadlevel");
     }
 
     [ConCommand("logic_timescale")]
     static void cvar_logic_timescale(float argTimeScale)
     {
-        DebugCore.FeedEntry("Setting timescale to " + argTimeScale, "", FeedEntryType.Info);
+        Ascalon.Log("Setting timescale to " + argTimeScale, "", LogMode.Info);
         Time.timeScale = argTimeScale;
     }
 
@@ -48,12 +48,12 @@ public class BaseCommands
         Debug.Log(argPath);
         if (prefab != null)
         {
-            DebugCore.FeedEntry("Spawning asset");
-            GameObject.Instantiate(prefab, DebugCoreUtil.MouseWorldPosition(), Quaternion.Euler(0, 0, 0));
+            Ascalon.Log("Spawning asset");
+            GameObject.Instantiate(prefab, AscalonUtil.MouseWorldPosition(), Quaternion.Euler(0, 0, 0));
         }
         else
         {
-            DebugCore.FeedEntry("Invalid asset specified");
+            Ascalon.Log("Invalid asset specified");
         }
     }
 

@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//console-related commands
+//This class defines commands and ConVars related to the system itself.
+//Some of these are vital to the system's function and are marked as
+//such - do not modify them unless you know what you're doing.
 public class ConRelCommands
 {
     [ConVar("con_verbose", "Set verbose mode on debug console")]
@@ -18,13 +20,13 @@ public class ConRelCommands
     [ConCommand("help", "Get info about a command or ConVar")]
     static void cmd_help(string argEntryName)
     {
-        ConCommand findCommand = DebugCore.GetConCommandEntry(argEntryName);
-        ConVar findConVar = DebugCore.GetConVarEntry(argEntryName);
+        ConCommand findCommand = Ascalon.GetConCommandEntry(argEntryName);
+        ConVar findConVar = Ascalon.GetConVarEntry(argEntryName);
 
-        if (DebugCore.ConCommandExists(argEntryName))
+        if (Ascalon.ConCommandExists(argEntryName))
         {
             string parmsString = "";
-            System.Tuple<string, string>[] commandParms = DebugCoreUtil.ParmsNamesToStrings(findCommand.parms);
+            System.Tuple<string, string>[] commandParms = AscalonUtil.ParmsNamesToStrings(findCommand.parms);
 
             for (int i = 0; i < commandParms.Length; i++)
             {
@@ -57,14 +59,15 @@ public class ConRelCommands
                 flagsString.Remove(flagsString.Length - 1, 1);
             }
 
-            DebugCore.FeedEntry("Help for command '" + findCommand.name + "':",
+            Ascalon.Log("Help for command '" + findCommand.name + "':",
                                    " * Description:\n" + findCommand.description +
                                    "\n\n * Parameters:\n" + parmsString +
                                    "\n\n * Flags: \n" + flagsString,
-                                   FeedEntryType.Info);
+                                   LogMode.Info);
         }
-        else if (DebugCore.ConVarExists(argEntryName))
+        else if (Ascalon.ConVarExists(argEntryName))
         {
+            string dataString = AscalonUtil.ConVarDataToString(findConVar.GetData());
             string flagsString = "";
             if (findConVar.flags == 0)
             {
@@ -77,22 +80,27 @@ public class ConRelCommands
                     if (findConVar.flags.HasFlag(flag))
                     {
                         flagsString += flag.ToString() + "\n";
+
+                        if (flag == ConFlags.Sensitive)
+                        {
+                            dataString = "(PROTECTED)";
+                        }
                     }
                 }
 
                 flagsString.Remove(flagsString.Length - 1, 1);
             }
 
-            DebugCore.FeedEntry("Help for ConVar '" + findConVar.name + "':",
-                                   " * Value:\n" + DebugCoreUtil.ConVarDataToString(findConVar.GetData()) +
+            Ascalon.Log("Help for ConVar '" + findConVar.name + "':",
+                                   " * Value:\n" + dataString +
                                    "\n\n * Description:\n" + findConVar.description +
                                    "\n\n * Type:\n" + findConVar.cvarDataType +
                                    "\n\n * Flags:\n" + flagsString,
-                                   FeedEntryType.Info);
+                                   LogMode.Info);
         }
         else
         {
-            DebugCore.FeedEntry("No such command or ConVar \"" + argEntryName + "\"", "", FeedEntryType.Error);
+            Ascalon.Log("No such command or ConVar \"" + argEntryName + "\"", "", LogMode.Error);
         }
     }
 
@@ -111,22 +119,22 @@ public class ConRelCommands
     static ConVar cvar_client_allowservercall = new ConVar(false);
 
     [ConVar("server_cheats", "Determines whether commands and ConVars marked\nas cheats may be used", ConFlags.ClientReplicated | ConFlags.NotifyClients)]
-    static ConVar cvar_host_cheats = new ConVar(false);
+    static ConVar cvar_server_cheats = new ConVar(false);
 
     [ConCommand("client_writeconfig", "Write a configuration file with the specified name")]
     static void cmd_client_writeconfig(string argConfigName)
     {
         Debug.Log("Writing config to \"" + Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argConfigName + ".cfg\"");
-        DebugConfigTools.WriteConfigUnity(argConfigName);
+        AscalonConfigTools.WriteConfigUnity(argConfigName);
+    }
+
+    [ConCommand("client_runconfig", "Run a configuration file with the specified name")]
+    static void cmd_client_runconfig(string argConfigName)
+    {
+        AscalonConfigTools.ReadConfigUnity(argConfigName);
     }
 
     //-------------------//
     // End vital section //
     //-------------------//
-
-    [ConCommand("client_runconfig", "Run a configuration file with the specified name")]
-    static void cmd_client_runconfig(string argConfigName)
-    {
-        DebugConfigTools.ReadConfigUnity(argConfigName);
-    }
 }

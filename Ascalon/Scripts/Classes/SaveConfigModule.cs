@@ -7,6 +7,6 @@ public class SaveConfigModule : MonoBehaviour
 {
     private void OnApplicationQuit()
     {
-        DebugConfigTools.WriteConfigUnity("config");
+        AscalonConfigTools.WriteConfigUnity("config");
     }
 }

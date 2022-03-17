@@ -9,10 +9,8 @@ using UnityEngine.EventSystems;
 using TMPro;
 
 //this is the stock implementation of the UI
-public class DebugFeed : DebugUIModule
+public class DebugFeed : AscalonUIModule
 {
-    //singleton
-    public static DebugFeed feedInstance;
 
     //tracking
     //todo: sort better
@@ -20,12 +18,11 @@ public class DebugFeed : DebugUIModule
 
     [SerializeField] private GameObject uiDebugLogPanel;
     public GameObject uiDebugLogContent;
-    [SerializeField] private ScrollRect uiDebugLogScrollRect;
 
     [SerializeField] private GameObject uiTooltipPanel;
     [SerializeField] private TextMeshProUGUI uiTooltipText;
 
-    [SerializeField] private GameObject uiFeedEntryPrefab;
+    [SerializeField] public GameObject uiFeedEntryPrefab;
 
     [SerializeField] private GameObject uiSuggestionPanel;
     [SerializeField] private TextMeshProUGUI uiSuggestionText;
@@ -49,9 +46,20 @@ public class DebugFeed : DebugUIModule
     public bool entryAdded = false;
     public bool inputFieldActive = false;
 
-    public override void Awake()
+    public override void Initialize()
     {
-        base.Awake();
+        base.Initialize();
+
+        uiInputField = AscalonUnity.instance.transform.GetChild(0).Find("Command Entry").GetComponent<TMP_InputField>();
+        uiDebugLogPanel = AscalonUnity.instance.transform.GetChild(0).gameObject;
+        uiDebugLogContent = AscalonUnity.instance.transform.GetChild(0).Find("Viewport").Find("Content").gameObject;
+        uiTooltipPanel = AscalonUnity.instance.transform.GetChild(1).gameObject;
+        uiTooltipText = AscalonUnity.instance.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>();
+        uiSuggestionPanel = AscalonUnity.instance.transform.GetChild(0).Find("Command Entry").Find("Suggestions Panel").gameObject;
+        uiSuggestionText = uiSuggestionPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        uiRaycaster = AscalonUnity.instance.gameObject.GetComponent<GraphicRaycaster>();
+
+        uiFeedEntryPrefab = AscalonUnity.instance.uiFeedEntryPrefab.gameObject;
 
         //add a callback to handle standard unity debug logs
         Application.logMessageReceived += FeedLogHandler;
@@ -61,16 +69,10 @@ public class DebugFeed : DebugUIModule
         uiInputField.onSubmit.AddListener(Call);
     }
 
-    private void Start()
-    {
-        //subscribe to callbacks after command execution
-        DebugCore.instance.onCallCompleted += OnCallComplete;
-    }
-
     public override void Update()
     {
         //tooltip logic
-        if (uiDebugLogPanel.activeSelf == true)
+        if (uiDebugLogPanel.activeInHierarchy == true)
         {
             uiPointerEventData = new PointerEventData(uiEventSystem);
             uiPointerEventData.position = Input.mousePosition;
@@ -105,22 +107,7 @@ public class DebugFeed : DebugUIModule
             }
         }
 
-        //scroll to the bottom if we were at it before
-        //todo: this breaks, very rarely
-        if (logWasAtBottom && entryAdded)
-        {
-            uiDebugLogScrollRect.verticalNormalizedPosition = 0;
-            entryAdded = false;
-        }
-
-        if (uiDebugLogScrollRect.verticalNormalizedPosition == 0)
-        {
-            logWasAtBottom = true;
-        }
-        else
-        {
-            logWasAtBottom = false;
-        }
+        //todo: reimplement scroll-to-bottom-if-at-bottom
     }
 
 
@@ -130,7 +117,7 @@ public class DebugFeed : DebugUIModule
 
 
 
-    public override void OnCallComplete(string argCallString, bool argSuccess, DebugCallContext argContext)
+    public override void OnCallComplete(string argCallString, bool argSuccess, AscalonCallContext argContext)
     {
         uiInputField.text = "";
     }
@@ -142,7 +129,7 @@ public class DebugFeed : DebugUIModule
 
 
 
-    public override void FeedEntry(string argTitle, string argContent, FeedEntryType argType)	//enters a string into the feed
+    public override void Log(string argTitle, string argContent, LogMode argType)	//enters a string into the feed
     {
         this.entryAdded = true;
 
@@ -154,43 +141,43 @@ public class DebugFeed : DebugUIModule
 
         switch (argType) //add entry
         {
-            case FeedEntryType.Info:
+            case LogMode.Info:
                 GameObject newEntryInfo = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform); //todo: the second var is missingreference on scene reload, but apparently not in editor?? why???
                 newEntryInfo.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                 newEntryInfo.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                 newEntryInfo.transform.GetChild(2).gameObject.SetActive(true);
                 break;
 
-            case FeedEntryType.Warning:
+            case LogMode.Warning:
                 GameObject newEntryWarning = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                 newEntryWarning.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                 newEntryWarning.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                 newEntryWarning.transform.GetChild(3).gameObject.SetActive(true);
                 break;
 
-            case FeedEntryType.Error:
+            case LogMode.Error:
                 GameObject newEntryError = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                 newEntryError.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                 newEntryError.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                 newEntryError.transform.GetChild(4).gameObject.SetActive(true);
                 break;
 
-            case FeedEntryType.Assertion:
+            case LogMode.Assertion:
                 GameObject newEntryAssertion = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                 newEntryAssertion.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                 newEntryAssertion.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                 newEntryAssertion.transform.GetChild(5).gameObject.SetActive(true);
                 break;
 
-            case FeedEntryType.Exception:
+            case LogMode.Exception:
                 GameObject newEntryException = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                 newEntryException.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                 newEntryException.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
                 newEntryException.transform.GetChild(5).gameObject.SetActive(true);
                 break;
 
-            case FeedEntryType.InfoVerbose:
-                if ((bool)DebugCore.GetConVar("con_verbose"))
+            case LogMode.InfoVerbose:
+                if ((bool)Ascalon.GetConVar("con_verbose"))
                 {
                     GameObject newEntryInfoVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                     newEntryInfoVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
@@ -199,8 +186,8 @@ public class DebugFeed : DebugUIModule
                 }
                 break;
 
-            case FeedEntryType.WarningVerbose:
-                if ((bool)DebugCore.GetConVar("con_verbose"))
+            case LogMode.WarningVerbose:
+                if ((bool)Ascalon.GetConVar("con_verbose"))
                 {
                     GameObject newEntryWarningVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                     newEntryWarningVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
@@ -209,8 +196,8 @@ public class DebugFeed : DebugUIModule
                 }
                 break;
 
-            case FeedEntryType.ErrorVerbose:
-                if ((bool)DebugCore.GetConVar("con_verbose"))
+            case LogMode.ErrorVerbose:
+                if ((bool)Ascalon.GetConVar("con_verbose"))
                 {
                     GameObject newEntryErrorVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                     newEntryErrorVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
@@ -219,8 +206,8 @@ public class DebugFeed : DebugUIModule
                 }
                 break;
 
-            case FeedEntryType.AssertionVerbose:
-                if ((bool)DebugCore.GetConVar("con_verbose"))
+            case LogMode.AssertionVerbose:
+                if ((bool)Ascalon.GetConVar("con_verbose"))
                 {
                     GameObject newEntryAssertionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                     newEntryAssertionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
@@ -229,8 +216,8 @@ public class DebugFeed : DebugUIModule
                 }
                 break;
 
-            case FeedEntryType.ExceptionVerbose:
-                if ((bool)DebugCore.GetConVar("con_verbose"))
+            case LogMode.ExceptionVerbose:
+                if ((bool)Ascalon.GetConVar("con_verbose"))
                 {
                     GameObject newEntryExceptionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
                     newEntryExceptionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
@@ -257,23 +244,23 @@ public class DebugFeed : DebugUIModule
         switch (argLogType)
         {
             case LogType.Log:
-                DebugCore.FeedEntry(argLogString, argStackTrace, FeedEntryType.Info);
+                Ascalon.Log(argLogString, argStackTrace, LogMode.Info);
                 break;
 
             case LogType.Warning:
-                DebugCore.FeedEntry(argLogString, argStackTrace, FeedEntryType.Warning);
+                Ascalon.Log(argLogString, argStackTrace, LogMode.Warning);
                 break;
 
             case LogType.Error:
-                DebugCore.FeedEntry(argLogString, argStackTrace, FeedEntryType.Error);
+                Ascalon.Log(argLogString, argStackTrace, LogMode.Error);
                 break;
 
             case LogType.Assert:
-                DebugCore.FeedEntry(argLogString, argStackTrace, FeedEntryType.Assertion);
+                Ascalon.Log(argLogString, argStackTrace, LogMode.Assertion);
                 break;
 
             case LogType.Exception:
-                //DebugConsole.FeedEntry(argLogString, argStackTrace, FeedEntryType.Exception);
+                //DebugConsole.FeedEntry(argLogString, argStackTrace, LogType.Exception);
                 break;
         }
     }
@@ -294,10 +281,10 @@ public class DebugFeed : DebugUIModule
                 string firstSegment = uiInputField.text.Split()[0];
                 uiSuggestionText.text = firstSegment;
 
-                if (DebugCore.ConCommandExists(firstSegment))
+                if (Ascalon.ConCommandExists(firstSegment))
                 {
                     uiSuggestionText.text += " (";
-                    ConCommand passedCommand = DebugCore.GetConCommandEntry(firstSegment);
+                    ConCommand passedCommand = Ascalon.GetConCommandEntry(firstSegment);
                     if (passedCommand.parms.Length > 0)
                     {
                         foreach (ParameterInfo parm in passedCommand.parms)
@@ -312,9 +299,9 @@ public class DebugFeed : DebugUIModule
                         uiSuggestionText.text = firstSegment + " (none)";
                     }
                 }
-                else if (DebugCore.ConVarExists(firstSegment))
+                else if (Ascalon.ConVarExists(firstSegment))
                 {
-                    ConVar passedConVar = DebugCore.GetConVarEntry(firstSegment);
+                    ConVar passedConVar = Ascalon.GetConVarEntry(firstSegment);
                     uiSuggestionText.text += " " + passedConVar.GetData() + " (" + passedConVar.cvarDataType.ToString() + ")";
                 }
             }
@@ -337,13 +324,13 @@ public class DebugFeed : DebugUIModule
                 //todo: compile combined list of entries for efficiency?
 
                 //add all matching commands
-                List<string> matchingEntries = DebugCore.instance.conCommands.FindAll(ConCommand => ConCommand.name.StartsWith(inputName))
+                List<string> matchingEntries = Ascalon.instance.conCommands.FindAll(ConCommand => ConCommand.name.StartsWith(inputName))
                                                           .Select(ConCommand => ConCommand.name)
                                                           .ToList();
 
                 //add all matching convars
-                matchingEntries.AddRange(DebugCore.instance.conVars.FindAll(ConVar => ConVar.name.StartsWith(inputName))
-                                               .Select(ConVar => ConVar.name + " " + (ConVar.flags.HasFlag(ConFlags.Sensitive) ? "(PROTECTED)" : DebugCoreUtil.ConVarDataToString(ConVar.GetData())))
+                matchingEntries.AddRange(Ascalon.instance.conVars.FindAll(ConVar => ConVar.name.StartsWith(inputName))
+                                               .Select(ConVar => ConVar.name + " " + (ConVar.flags.HasFlag(ConFlags.Sensitive) ? "(PROTECTED)" : AscalonUtil.ConVarDataToString(ConVar.GetData())))
                                                .ToList());
 
                 //sort alphabetically
@@ -496,7 +483,7 @@ public class DebugFeed : DebugUIModule
 
     public void Call(string argInput)
     {
-        DebugCore.Call(argInput, new DebugCallContext(DebugCallSource.User));
+        Ascalon.Call(argInput, new AscalonCallContext(AscalonCallSource.User));
     }
 
 
@@ -523,52 +510,52 @@ public class DebugFeed : DebugUIModule
     [ConCommand("con_clear", "Clear the console of entries")]
     static void cmd_con_clear()
     {
-        DebugCore.instance.debugUI.ClearEntries();
+        Ascalon.instance.uiModule.ClearEntries();
     }
 }
 
-public partial class DebugCore
+public partial class Ascalon
 {
-    public static void FeedEntry(string argTitle, string argContent, FeedEntryType argType)
+    public static void Log(string argTitle, string argContent, LogMode argType)
     {
-        if (instance.debugUI == null)
+        if (instance.uiModule == null)
         {
             Console.WriteLine("FeedEntry > " + argTitle + "\nContent   > " + argContent + "\nType      > " + argType.ToString());
             return;
         }
 
-        instance.debugUI.FeedEntry(argTitle, argContent, argType);
+        instance.uiModule.Log(argTitle, argContent, argType);
     }
 
-    public static void FeedEntry(string argTitle, FeedEntryType argType)
+    public static void Log(string argTitle, LogMode argType)
     {
-        if (instance.debugUI == null)
+        if (instance.uiModule == null)
         {
             Console.WriteLine("FeedEntry > " + argTitle + "\nType      > " + argType.ToString());
             return;
         }
 
-        instance.debugUI.FeedEntry(argTitle, "", argType);
+        instance.uiModule.Log(argTitle, "", argType);
     }
 
-    public static void FeedEntry(string argTitle, string argContent)
+    public static void Log(string argTitle, string argContent)
     {
-        if (instance.debugUI == null)
+        if (instance.uiModule == null)
         {
             Console.WriteLine("FeedEntry > " + argTitle + "\nContent   > " + argContent);
         }
 
-        instance.debugUI.FeedEntry(argTitle, argContent, FeedEntryType.Info);
+        instance.uiModule.Log(argTitle, argContent, LogMode.Info);
     }
 
-    public static void FeedEntry(string argTitle)
+    public static void Log(string argTitle)
     {
-        if (instance.debugUI == null)
+        if (instance.uiModule == null)
         {
             Console.WriteLine("FeedEntry > " + argTitle);
             return;
         }
 
-        instance.debugUI.FeedEntry(argTitle, "", FeedEntryType.Info);
+        instance.uiModule.Log(argTitle, "", LogMode.Info);
     }
 }

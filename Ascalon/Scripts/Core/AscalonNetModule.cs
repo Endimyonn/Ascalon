@@ -1,6 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine;
+#endif
 
 //The debug net module is a developer-created interface between
 //the DebugCore and their network library of choice. Any modules
@@ -12,23 +16,35 @@ using UnityEngine;
 
 //All defined methods include skeletons to guide how a custom module
 //should work.
-public abstract class DebugNetModule : MonoBehaviour
+[System.Serializable]
+public abstract class AscalonNetModule
 {
     //singleton
-    public static DebugNetModule instance;
+    public static AscalonNetModule instance;
+
+    //reference to the core Ascalon instance
+    public Ascalon core;
 
     //Network role - should always be kept updated by the network
     //library in use.
     public NetRole role = NetRole.Inactive;
 
-    protected virtual void Awake()
+    public virtual void Initialize()
     {
         //singleton logic
         if (instance != null)
         {
-            Destroy(this);
+            Console.WriteLine("Duplicate AscalonNetModule of type " + this.GetType().Name + " created - do not do this!");
+            return;
         }
         instance = this;
+    }
+
+    //Update function is not usually needed for NetModules, but it is included
+    //for extensibility purposes.
+    public virtual void Update()
+    {
+
     }
 
     public static void SetRole(NetRole argRole)
@@ -42,7 +58,7 @@ public abstract class DebugNetModule : MonoBehaviour
     }
 
     //clients and servers should call this on a client with the proper context
-    public virtual void NetCall(string argCall, DebugCallContext argContext, DebugCallNetTarget argTarget)
+    public virtual void NetCall(string argCall, AscalonCallContext argContext, AscalonCallNetTarget argTarget)
     {
         if (GetRole() == NetRole.Inactive)
         {
@@ -61,7 +77,7 @@ public abstract class DebugNetModule : MonoBehaviour
 
     //Send a command/ConVar with ClientReplicated flag to all clients. Only
     //the server is allowed to run this.
-    public virtual void SendReplicatedToAllClients(string argCall, DebugCallContext argContext)
+    public virtual void SendReplicatedToAllClients(string argCall, AscalonCallContext argContext)
     {
         //security
         if (GetRole() != NetRole.Server)
@@ -74,14 +90,14 @@ public abstract class DebugNetModule : MonoBehaviour
 
     //Send all stored ConVars flagged with ClientReplicated to a client. Only
     //the server is allowed to run this.
-    public virtual void SendAllReplicatedToClient(DebugCallNetTarget argTarget)
+    public virtual void SendAllReplicatedToClient(AscalonCallNetTarget argTarget)
     {
         if (GetRole() != NetRole.Server)
         {
             return;
         }
 
-        foreach (ConVar conVar in GetComponent<DebugCore>().conVars)
+        foreach (ConVar conVar in core.conVars)
         {
             if (conVar.flags.HasFlag(ConFlags.ClientReplicated))
             {
@@ -92,7 +108,7 @@ public abstract class DebugNetModule : MonoBehaviour
 
     public virtual void ReceiveClientInfo(object argData)
     {
-        Debug.Log("Function in example DebugNetModule was called - use a derived one!");
+        Debug.Log("Function in example AscalonNetModule was called - use a derived one!");
 
         //stub
     }
@@ -105,12 +121,12 @@ public enum NetRole
     Server
 }
 
-public struct DebugCallNetTarget
+public struct AscalonCallNetTarget
 {
     public string targetClient;
     public NetRole targetMode;
 
-    public DebugCallNetTarget(NetRole argTargetingMode, string argTargetClient = "")
+    public AscalonCallNetTarget(NetRole argTargetingMode, string argTargetClient = "")
     {
         targetClient = argTargetClient;
         targetMode = argTargetingMode;

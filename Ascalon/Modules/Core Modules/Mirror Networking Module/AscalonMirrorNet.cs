@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-//DebugNetModule implementation for the Mirror library. As Mirror
+//AscalonNetModule implementation for the Mirror library. As Mirror
 //requires a class derived from NetworkBehaviour for RPCs, those
-//functions have been placed in DebugMirrorSegment. This class
+//functions have been placed in AscalonMirrorSegment. This class
 //also provides an example of how to implement networking.
-public class DebugMirrorNet : DebugNetModule
+public class AscalonMirrorNet : AscalonNetModule
 {
-    [SerializeField] public DebugMirrorRPCs debugRPCs;
+    [SerializeField] public AscalonMirrorRPCs debugRPCs;
 
-    protected override void Awake()
+    public override void Initialize()
     {
-        base.Awake();
+        base.Initialize();
     }
 
     public void InitializeNet()
@@ -21,17 +21,17 @@ public class DebugMirrorNet : DebugNetModule
         //if the network isn't fully initialized, do so
         if (debugRPCs == null)
         {
-            debugRPCs = NetworkClient.localPlayer.gameObject.GetComponent<DebugMirrorRPCs>();
+            debugRPCs = NetworkClient.localPlayer.gameObject.GetComponent<AscalonMirrorRPCs>();
         }
 
         if (debugRPCs == null)
         {
-            DebugCore.FeedEntry("DebugMirrorNet could not initialize", FeedEntryType.Error);
+            Ascalon.Log("AscalonMirrorNet could not initialize", LogMode.Error);
         }
     }
 
 
-    public override void NetCall(string argCall, DebugCallContext argContext, DebugCallNetTarget argTarget)
+    public override void NetCall(string argCall, AscalonCallContext argContext, AscalonCallNetTarget argTarget)
     {
         if (instance.role == NetRole.Inactive)
         {
@@ -43,7 +43,7 @@ public class DebugMirrorNet : DebugNetModule
         debugRPCs.RpcNetCall(argCall, argContext, argTarget);
     }
 
-    public override void SendReplicatedToAllClients(string argCall, DebugCallContext argContext)
+    public override void SendReplicatedToAllClients(string argCall, AscalonCallContext argContext)
     {
         //security
         if (GetRole() != NetRole.Server)
@@ -73,7 +73,7 @@ public class DebugMirrorNet : DebugNetModule
     }
 
 
-    public IEnumerator DelayedReplication(string argCall, DebugCallContext argContext)
+    public IEnumerator DelayedReplication(string argCall, AscalonCallContext argContext)
     {
         yield return new WaitForEndOfFrame();
 
@@ -90,23 +90,23 @@ public class DebugMirrorNet : DebugNetModule
         }
     }
 
-    public override void SendAllReplicatedToClient(DebugCallNetTarget argTarget)
+    public override void SendAllReplicatedToClient(AscalonCallNetTarget argTarget)
     {
-        if (DebugNetModule.GetRole() == NetRole.Client)
+        if (AscalonNetModule.GetRole() == NetRole.Client)
         {
             return;
         }
 
         InitializeNet();
 
-        foreach (ConVar conVar in DebugCore.instance.conVars)
+        foreach (ConVar conVar in Ascalon.instance.conVars)
         {
             if (conVar.flags.HasFlag(ConFlags.ClientReplicated))
             {
                 debugRPCs.RpcReplicateToClient(
                     GameObject.Find(argTarget.targetClient).GetComponent<NetworkIdentity>().connectionToClient,
-                    conVar.name + " " + DebugCoreUtil.ConVarDataToString(conVar.GetData()),
-                    new DebugCallContext(DebugCallSource.Server)
+                    conVar.name + " " + AscalonUtil.ConVarDataToString(conVar.GetData()),
+                    new AscalonCallContext(AscalonCallSource.Server)
                     );
             }
         }
@@ -115,7 +115,7 @@ public class DebugMirrorNet : DebugNetModule
     //a NetworkManager derivative should call this on every joining client using OnServerConnect()
     public void SendAllReplicatedToClient(NetworkConnection argClient)
     {
-        if (DebugNetModule.GetRole() != NetRole.Server)
+        if (AscalonNetModule.GetRole() != NetRole.Server)
         {
             return;
         }
@@ -123,14 +123,14 @@ public class DebugMirrorNet : DebugNetModule
         InitializeNet();
 
         //todo: fix
-        foreach (ConVar conVar in DebugCore.instance.conVars)
+        foreach (ConVar conVar in Ascalon.instance.conVars)
         {
             if (conVar.flags.HasFlag(ConFlags.ClientReplicated))
             {
                 //do not replicate to the server
                 if (argClient.connectionId != NetworkClient.connection.connectionId)
                 {
-                    debugRPCs.RpcReplicateToClient(argClient, conVar.name + " " + DebugCoreUtil.ConVarDataToString(conVar.GetData()), new DebugCallContext(DebugCallSource.Server));
+                    debugRPCs.RpcReplicateToClient(argClient, conVar.name + " " + AscalonUtil.ConVarDataToString(conVar.GetData()), new AscalonCallContext(AscalonCallSource.Server));
                 }
             }
         }

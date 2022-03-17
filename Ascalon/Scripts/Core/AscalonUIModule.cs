@@ -1,44 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine;
+#endif
 
 //The debug UI module provides a front-end for the developer
 //and users to work with the DebugCore - this can be through
 //sending Calls to it and/or receiving output from it.
 
 //This module is not necessary for DebugCore to function.
-public abstract class DebugUIModule : MonoBehaviour
+[System.Serializable]
+public abstract class AscalonUIModule
 {
     //singleton
-    public static DebugUIModule instance;
+    public static AscalonUIModule instance;
 
-    public virtual void Awake()
+    //reference to the core Ascalon instance
+    public Ascalon core;
+
+    public virtual void Initialize()
     {
         if (instance != null)
         {
-            Destroy(this);
+            return;
         }
         instance = this;
     }
 
     public virtual void Update()
     {
-        
-    }
 
-    public virtual void LateUpdate()
-    {
-        
     }
 
     //gets run after a call is completed - for instance, this can be used to clear an input field. optional
-    public virtual void OnCallComplete(string argCallString, bool argSuccess, DebugCallContext argContext)
+    public virtual void OnCallComplete(string argCallString, bool argSuccess, AscalonCallContext argContext)
     {
         
     }
 
     //create a feed entry - optional but recommended
-    public virtual void FeedEntry(string argTitle, string argContent, FeedEntryType argType)
+    public virtual void Log(string argTitle, string argContent, LogMode argType)
     {
         
     }
@@ -51,7 +53,7 @@ public abstract class DebugUIModule : MonoBehaviour
 }
 
 
-public enum FeedEntryType
+public enum LogMode
 {
     Info,
     Warning,

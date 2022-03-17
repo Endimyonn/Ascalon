@@ -23,16 +23,23 @@ using TMPro;
 //aside from Unity's own EventSystem (for text entry frontend) are used.
 
 //For examples of how to implement commands and ConVars into code, see BaseCommands.cs.
-public partial class DebugCore : MonoBehaviour
+[System.Serializable]
+public partial class Ascalon
 {
     //singleton
-    public static DebugCore instance;
+    public static Ascalon instance;
 
     //UI module
-    public DebugUIModule debugUI;
+    public AscalonUIModule uiModule;
 
     //networking module
-    public DebugNetModule debugNet;
+    public AscalonNetModule netModule;
+
+    //RCon server
+    public AscalonRConServer rconServer;
+
+    //lets things know whether initialization completed;
+    public bool ready = false;
 
     //default config info
     public string mainConfigName = "config";
@@ -41,7 +48,7 @@ public partial class DebugCore : MonoBehaviour
 
 
     //delegates
-    public delegate void OnCallCompleted(string argCallString, bool argSuccess, DebugCallContext argContext);
+    public delegate void OnCallCompleted(string argCallString, bool argSuccess, AscalonCallContext argContext);
     public OnCallCompleted onCallCompleted;
     
 
@@ -62,20 +69,18 @@ public partial class DebugCore : MonoBehaviour
     public List<ConCommand> conCommands = new List<ConCommand>();  //master list of commands - see relevant struct
     public List<ConVar> conVars = new List<ConVar>();
 
-    private void Awake()
+    public void Initialize()
     {
         //singleton logic
-        if (instance)
+        if (instance != null)
         {
-            Debug.Log("destroying duplicate debugcore");
-            Destroy(transform.root.gameObject);
+            Console.WriteLine("Duplicate Ascalon instance created - do not do this!");
+            return;
         }
         else
         {
             instance = this;
         }
-
-        DontDestroyOnLoad(transform.root.gameObject);
 
 
 
@@ -100,9 +105,9 @@ public partial class DebugCore : MonoBehaviour
                     //create a new ConCommand and add it to the master list
                     conCommands.Add(new ConCommand(foundAttribute.cmdName, foundAttribute.cmdDescription, foundMethod, foundAttribute.cmdFlags));
                 }
-                else if (foundMethod.GetCustomAttributes(typeof(DebugParameterParserAttribute), false).Length > 0)
+                else if (foundMethod.GetCustomAttributes(typeof(AscalonParameterParserAttribute), false).Length > 0)
                 {
-                    DebugParameterParserAttribute foundAttribute = (DebugParameterParserAttribute)foundMethod.GetCustomAttribute(typeof(DebugParameterParserAttribute));
+                    AscalonParameterParserAttribute foundAttribute = (AscalonParameterParserAttribute)foundMethod.GetCustomAttribute(typeof(AscalonParameterParserAttribute));
                     parameterParsers.Add(new KeyValuePair<string, MethodInfo>(foundAttribute.typeName, foundMethod));
                 }
             }
@@ -135,12 +140,34 @@ public partial class DebugCore : MonoBehaviour
         //load config
         if (!loadConfigUnityStyle)
         {
-            DebugConfigTools.ReadConfig(mainConfigDirectory + mainConfigName);
+            AscalonConfigTools.ReadConfig(mainConfigDirectory + mainConfigName);
         }
         else
         {
-            DebugConfigTools.ReadConfigUnity(mainConfigName);
+            AscalonConfigTools.ReadConfigUnity(mainConfigName);
         }
+
+        //initialize modules
+        if (uiModule != null)
+        {
+            uiModule.core = this;
+            uiModule.Initialize();
+        }
+
+        if (netModule != null)
+        {
+            netModule.core = this;
+            netModule.Initialize();
+        }
+        else
+        {
+            Console.WriteLine("Ascalon could not start because no NetModule was provided before initialization!");
+        }
+
+        rconServer = new AscalonRConServer();
+        rconServer.StartListening();
+
+        ready = true;
     }
 
 
@@ -151,7 +178,7 @@ public partial class DebugCore : MonoBehaviour
 
 
 
-    public static void Call(string argInput, DebugCallContext argContext)
+    public static void Call(string argInput, AscalonCallContext argContext)
     {
         //make sure we have a command to work with
         if (argInput == null || argInput == "")
@@ -175,7 +202,7 @@ public partial class DebugCore : MonoBehaviour
         //check if the command exists
         if (!instance.conCommands.Any(ConCommand => ConCommand.name == inputName) && !instance.conVars.Any(ConVarInstance => ConVarInstance.name == inputName))
         {
-            FeedEntry("Error: no such command or ConVar '" + inputName.ToLower() + "'", "The command or ConVar entered does not exist.\nOriginal received string: " + argInput, FeedEntryType.Error);
+            Ascalon.Log("Error: no such command or ConVar '" + inputName.ToLower() + "'", "The command or ConVar entered does not exist.\nOriginal received string: " + argInput, LogMode.Error);
 
             //callback
             if (instance.onCallCompleted != null)
@@ -202,7 +229,7 @@ public partial class DebugCore : MonoBehaviour
                 findConObject.conObject = findCommand;
                 findConObject.flags = findCommand.flags;
 
-                inputValidity = instance.ValidateInputParms(inputParms, DebugCoreUtil.ParmsToStrings(findCommand.parms));
+                inputValidity = instance.ValidateInputParms(inputParms, AscalonUtil.ParmsToStrings(findCommand.parms));
             }
             else if (findConVar.name != null)
             {
@@ -210,12 +237,12 @@ public partial class DebugCore : MonoBehaviour
                 findConObject.conObject = findConVar;
                 findConObject.flags = findConVar.flags;
 
-                inputValidity = instance.ValidateInputParms(inputParms, DebugCoreUtil.ParmsToStrings(findConVar.cvarDataType));
+                inputValidity = instance.ValidateInputParms(inputParms, AscalonUtil.ParmsToStrings(findConVar.cvarDataType));
             }
 
             //check ConFlags and context before proceeding
-            bool flagsPassed = DebugCore.instance.ValidateFlags(argContext, findConObject.flags);
-            bool contextPassed = DebugCore.instance.ValidateContext(argContext, findConObject.flags);
+            bool flagsPassed = Ascalon.instance.ValidateFlags(argContext, findConObject.flags);
+            bool contextPassed = Ascalon.instance.ValidateContext(argContext, findConObject.flags);
 
 
 
@@ -225,10 +252,9 @@ public partial class DebugCore : MonoBehaviour
                 if (flagsPassed && contextPassed)
                 {
                     //send call to server if it is marked to be ran on server
-                    if (findConObject.flags.HasFlag(ConFlags.RunOnServer) && DebugNetModule.GetRole() != NetRole.Server)
+                    if (findConObject.flags.HasFlag(ConFlags.RunOnServer) && AscalonNetModule.GetRole() != NetRole.Server)
                     {
-                        Debug.Log("client sending call to server!" + argInput);
-                        instance.debugNet.NetCall(argInput, new DebugCallContext(DebugNetModule.GetRole()), new DebugCallNetTarget(NetRole.Server));
+                        instance.netModule.NetCall(argInput, new AscalonCallContext(AscalonNetModule.GetRole()), new AscalonCallNetTarget(NetRole.Server));
                         return;
                     }
                     else //run locally
@@ -245,9 +271,9 @@ public partial class DebugCore : MonoBehaviour
                         }
 
                         //if the call was a replicated object, replicate it on all clients
-                        if (findConObject.flags.HasFlag(ConFlags.ClientReplicated) && DebugNetModule.GetRole() == NetRole.Server)
+                        if (findConObject.flags.HasFlag(ConFlags.ClientReplicated) && AscalonNetModule.GetRole() == NetRole.Server)
                         {
-                            instance.debugNet.SendReplicatedToAllClients(argInput, new DebugCallContext(DebugCallSource.Server));
+                            instance.netModule.SendReplicatedToAllClients(argInput, new AscalonCallContext(AscalonCallSource.Server));
                         }
 
                         //run callback
@@ -270,7 +296,7 @@ public partial class DebugCore : MonoBehaviour
                 switch (inputValidity.failureReason)
                 {
                     case InputParmValidationFailureReason.ParmCountMismatch:
-                        DebugCore.FeedEntry("Error: incorrect number of arguments provided", "The number of arguments provided does not match the number expected for the command or ConVar.\nExpected: " + (findCommand.name != null ? findCommand.parms.Length.ToString() : "1") + "\nProvided: " + inputParms.Length, FeedEntryType.Error);
+                        Ascalon.Log("Error: incorrect number of arguments provided", "The number of arguments provided does not match the number expected for the command or ConVar.\nExpected: " + (findCommand.name != null ? findCommand.parms.Length.ToString() : "1") + "\nProvided: " + inputParms.Length, LogMode.Error);
                         break;
 
                     case InputParmValidationFailureReason.DataTypeMismatch:
@@ -279,7 +305,7 @@ public partial class DebugCore : MonoBehaviour
                         {
                             failedParms += "Argument " + failedParm.Item3 + " (" + failedParm.Item1 + ") is not of type " + failedParm.Item2 + "\n";
                         }
-                        DebugCore.FeedEntry("Error: argument types do not match", "The type(s) of the argument(s) provided for the specified command or ConVar do not match what is required by it and could not be converted. Failed arguments:\n" + failedParms.Remove(failedParms.Length - 1, 1), FeedEntryType.Error);
+                        Ascalon.Log("Error: argument types do not match", "The type(s) of the argument(s) provided for the specified command or ConVar do not match what is required by it and could not be converted. Failed arguments:\n" + failedParms.Remove(failedParms.Length - 1, 1), LogMode.Error);
                         break;
 
                     case InputParmValidationFailureReason.NoParserForType:
@@ -290,11 +316,11 @@ public partial class DebugCore : MonoBehaviour
                         }
                         errorString = errorString.Remove(errorString.Length - 1);
 
-                        DebugCore.FeedEntry("Error: no parser found for argument(s)", errorString, FeedEntryType.Error);
+                        Ascalon.Log("Error: no parser found for argument(s)", errorString, LogMode.Error);
                         break;
 
                     case InputParmValidationFailureReason.Other:
-                        DebugCore.FeedEntry("Error: issue occurred while parsing command arguments", inputValidity.customErrorMessage, FeedEntryType.Error);
+                        Ascalon.Log("Error: issue occurred while parsing command arguments", inputValidity.customErrorMessage, LogMode.Error);
                         break;
                 }
 
@@ -309,10 +335,10 @@ public partial class DebugCore : MonoBehaviour
     //if we receive a call without a specified source, assume it's internal
     public static void Call(string argString)
     {
-        DebugCallContext context = new DebugCallContext();
-        context.source = DebugCallSource.Internal;
+        AscalonCallContext context = new AscalonCallContext();
+        context.source = AscalonCallSource.Internal;
 
-        DebugCore.Call(argString, context);
+        Ascalon.Call(argString, context);
     }
 
     List<string> GetInputParms(string argInput)
@@ -422,7 +448,7 @@ public partial class DebugCore : MonoBehaviour
                     failed = true;
                 }
                 
-                DebugParameterParseResult parseResult = (DebugParameterParseResult)parameterParsers.Find(parser => parser.Key == argInputParms[i]).Value.Invoke(null, providedParm);
+                AscalonParameterParseResult parseResult = (AscalonParameterParseResult)parameterParsers.Find(parser => parser.Key == argInputParms[i]).Value.Invoke(null, providedParm);
 
                 if (parseResult.success)
                 {
@@ -450,12 +476,12 @@ public partial class DebugCore : MonoBehaviour
     }
 
     //validate flags on a call
-    bool ValidateFlags(DebugCallContext argContext, ConFlags argFlags)
+    bool ValidateFlags(AscalonCallContext argContext, ConFlags argFlags)
     {
         if (argFlags.HasFlag(ConFlags.Cheat))
         {
             //don't call if cheats are disabled
-            if ((bool)DebugCore.GetConVar("server_cheats") == false)
+            if ((bool)Ascalon.GetConVar("server_cheats") == false)
             {
                 return false;
             }
@@ -464,29 +490,29 @@ public partial class DebugCore : MonoBehaviour
         if (argFlags.HasFlag(ConFlags.ServerOnly))
         {
             //don't call if we are not the server
-            if (DebugNetModule.GetRole() != NetRole.Server)
+            if (AscalonNetModule.GetRole() != NetRole.Server)
             {
 
-                if (argContext.source == DebugCallSource.Server)
+                if (argContext.source == AscalonCallSource.Server)
                 {
                     //if it's ClientReplicated, we can do it still
                     if (!argFlags.HasFlag(ConFlags.ClientReplicated))
                     {
-                        DebugCore.FeedEntry("You do not have permission for this.", FeedEntryType.WarningVerbose);
+                        Ascalon.Log("You do not have permission for this.", LogMode.WarningVerbose);
                         return false;
                     }
                 }
                 else
                 {
-                    DebugCore.FeedEntry("You do not have permission for this.", FeedEntryType.WarningVerbose);
+                    Ascalon.Log("You do not have permission for this.", LogMode.WarningVerbose);
                     return false;
                 }
             }
 
             //don't call if this came from a client call
-            if (argContext.source == DebugCallSource.Client)
+            if (argContext.source == AscalonCallSource.Client)
             {
-                DebugCore.FeedEntry("This command or ConVar may only be run by the server.", FeedEntryType.WarningVerbose);
+                Ascalon.Log("This command or ConVar may only be run by the server.", LogMode.WarningVerbose);
                 return false;
             }
         }
@@ -494,18 +520,18 @@ public partial class DebugCore : MonoBehaviour
         if (argFlags.HasFlag(ConFlags.LockWhileConnected))
         {
             //don't call if we are in a network session
-            if (DebugNetModule.GetRole() != NetRole.Inactive)
+            if (AscalonNetModule.GetRole() != NetRole.Inactive)
             {
                 return false;
             }
         }
 
-        if (argContext.source == DebugCallSource.RCon)
+        if (argContext.source == AscalonCallSource.RCon)
         {
             //don't call if RCon is disabled on this command or ConVar
             if (argFlags.HasFlag(ConFlags.NoRCon))
             {
-                DebugCore.FeedEntry("RCon call was made for command or ConVar that disallows RCon.", FeedEntryType.WarningVerbose);
+                Ascalon.Log("RCon call was made for command or ConVar that disallows RCon.", LogMode.WarningVerbose);
                 return false;
             }
         }
@@ -514,27 +540,27 @@ public partial class DebugCore : MonoBehaviour
     }
 
     //validate context on a call
-    bool ValidateContext(DebugCallContext argContext, ConFlags argFlags)
+    bool ValidateContext(AscalonCallContext argContext, ConFlags argFlags)
     {
-        if (argContext.source == DebugCallSource.Internal)
+        if (argContext.source == AscalonCallSource.Internal)
         {
             return true;
         }
         
-        if (argContext.source == DebugCallSource.User)
+        if (argContext.source == AscalonCallSource.User)
         {
             return true;
         }
 
-        if (argContext.source == DebugCallSource.Client)
+        if (argContext.source == AscalonCallSource.Client)
         {
             //server should always accept client calls
-            if (debugNet.role == NetRole.Server)
+            if (netModule.role == NetRole.Server)
             {
                 return true;
             }
 
-            if ((bool)DebugCore.GetConVar("client_allowclientcall") == true)
+            if ((bool)Ascalon.GetConVar("client_allowclientcall") == true)
             {
                 return true;
             }
@@ -542,14 +568,14 @@ public partial class DebugCore : MonoBehaviour
             return false;
         }
 
-        if (argContext.source == DebugCallSource.Server)
+        if (argContext.source == AscalonCallSource.Server)
         {
             if (argFlags.HasFlag(ConFlags.ClientReplicated))
             {
                 return true;
             }
 
-            if ((bool)DebugCore.GetConVar("client_allowservercall") == true)
+            if ((bool)Ascalon.GetConVar("client_allowservercall") == true)
             {
                 return true;
             }
@@ -584,32 +610,32 @@ public partial class DebugCore : MonoBehaviour
 
     public static object GetConVar(string argConVarName) //todo: custom struct or tuple with bool and object for better nullreference handling?
     {
-        return DebugCore.instance.conVars.FirstOrDefault(ConVar => ConVar.name == argConVarName).GetData();
+        return Ascalon.instance.conVars.FirstOrDefault(ConVar => ConVar.name == argConVarName).GetData();
     }
 
     public static void SetConVar(string argConVarName, object argConVarData)
     {
-        DebugCore.Call(argConVarName + " " + argConVarData.ToString());
+        Ascalon.Call(argConVarName + " " + argConVarData.ToString());
     }
 
     public static ConCommand GetConCommandEntry(string argCommandName)
     {
-        return DebugCore.instance.conCommands.FirstOrDefault(ConCommand => ConCommand.name == argCommandName);
+        return Ascalon.instance.conCommands.FirstOrDefault(ConCommand => ConCommand.name == argCommandName);
     }
 
     public static ConVar GetConVarEntry(string argConVarName)
     {
-        return DebugCore.instance.conVars.FirstOrDefault(ConVar => ConVar.name == argConVarName);
+        return Ascalon.instance.conVars.FirstOrDefault(ConVar => ConVar.name == argConVarName);
     }
 
     public static bool ConCommandExists(string argEntryName)
     {
-        return DebugCore.instance.conCommands.Any(ConCommand => ConCommand.name == argEntryName);
+        return Ascalon.instance.conCommands.Any(ConCommand => ConCommand.name == argEntryName);
     }
 
     public static bool ConVarExists(string argEntryName)
     {
-        return DebugCore.instance.conVars.Any(ConVar => ConVar.name == argEntryName);
+        return Ascalon.instance.conVars.Any(ConVar => ConVar.name == argEntryName);
     }
 
     public static bool CommandOrConVarExists(string argEntryName)
@@ -658,7 +684,7 @@ public class MiscConObject
     }
 }
 
-public enum DebugCallSource
+public enum AscalonCallSource
 {
     Internal, //from some local code somewhere
     User,     //from user input (eg a console frontend)
@@ -668,30 +694,30 @@ public enum DebugCallSource
 }
 
 [System.Serializable]
-public struct DebugCallContext
+public struct AscalonCallContext
 {
-    public DebugCallSource source;  //basic source info
+    public AscalonCallSource source;  //basic source info
     public string clientName;       //if call came from another client
 
-    public DebugCallContext(DebugCallSource argSource, string argClientName = "")
+    public AscalonCallContext(AscalonCallSource argSource, string argClientName = "")
     {
         source = argSource;
         clientName = argClientName;
     }
 
-    public DebugCallContext(NetRole argSource, string argClientName = "")
+    public AscalonCallContext(NetRole argSource, string argClientName = "")
     {
         if (argSource == NetRole.Client)
         {
-            source = DebugCallSource.Client;
+            source = AscalonCallSource.Client;
         }
         else if (argSource == NetRole.Server)
         {
-            source = DebugCallSource.Server;
+            source = AscalonCallSource.Server;
         }
         else //assume the call is internal otherwise
         {
-            source = DebugCallSource.Internal;
+            source = AscalonCallSource.Internal;
         }
 
         clientName = argClientName;
@@ -699,7 +725,7 @@ public struct DebugCallContext
 }
 
 //todo: figure out extensible way to implement this. string?
-public enum CallResult
+public enum AscalonCallResult
 {
     Success,
     FailureGeneric,
@@ -715,7 +741,7 @@ enum CommandParmScrubState
     Array
 }
 
-public class DebugParameterParseResult
+public class AscalonParameterParseResult
 {
     public bool success;
     public object result;
@@ -723,7 +749,7 @@ public class DebugParameterParseResult
     public List<Tuple<string, string, int>> mismatchedParms;
     public string customErrorMessage;
 
-    public DebugParameterParseResult()
+    public AscalonParameterParseResult()
     {
         success = true;
         result = null;
