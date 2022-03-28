@@ -271,7 +271,7 @@ public class DebugFeed : AscalonUIModule
 
 
 
-
+    //todo: comments please!!
     public void UpdateSuggestions()
     {
         if (uiInputField.text.Length > 0)
@@ -283,26 +283,32 @@ public class DebugFeed : AscalonUIModule
 
                 if (Ascalon.ConCommandExists(firstSegment))
                 {
-                    uiSuggestionText.text += " (";
-                    ConCommand passedCommand = Ascalon.GetConCommandEntry(firstSegment);
-                    if (passedCommand.parms.Length > 0)
+                    if (!Ascalon.GetConCommandEntry(firstSegment).flags.HasFlag(ConFlags.Hidden))
                     {
-                        foreach (ParameterInfo parm in passedCommand.parms)
+                        uiSuggestionText.text += " (";
+                        ConCommand passedCommand = Ascalon.GetConCommandEntry(firstSegment);
+                        if (passedCommand.parms.Length > 0)
                         {
-                            uiSuggestionText.text += "" + parm.Name + ":" + parm.ParameterType + "  ";
+                            foreach (ParameterInfo parm in passedCommand.parms)
+                            {
+                                uiSuggestionText.text += "" + parm.Name + ":" + parm.ParameterType + "  ";
+                            }
+                            uiSuggestionText.text = uiSuggestionText.text.Remove(uiSuggestionText.text.Length - 2);
+                            uiSuggestionText.text += ")";
                         }
-                        uiSuggestionText.text = uiSuggestionText.text.Remove(uiSuggestionText.text.Length - 2);
-                        uiSuggestionText.text += ")";
-                    }
-                    else
-                    {
-                        uiSuggestionText.text = firstSegment + " (none)";
+                        else
+                        {
+                            uiSuggestionText.text = firstSegment + " (none)";
+                        }
                     }
                 }
                 else if (Ascalon.ConVarExists(firstSegment))
                 {
-                    ConVar passedConVar = Ascalon.GetConVarEntry(firstSegment);
-                    uiSuggestionText.text += " " + passedConVar.GetData() + " (" + passedConVar.cvarDataType.ToString() + ")";
+                    if (Ascalon.GetConVarEntry(firstSegment).flags.HasFlag(ConFlags.Hidden))
+                    {
+                        ConVar passedConVar = Ascalon.GetConVarEntry(firstSegment);
+                        uiSuggestionText.text += " " + passedConVar.GetData() + " (" + passedConVar.cvarDataType.ToString() + ")";
+                    }
                 }
             }
             else //we don't have a complete first segment yet
@@ -325,11 +331,13 @@ public class DebugFeed : AscalonUIModule
 
                 //add all matching commands
                 List<string> matchingEntries = Ascalon.instance.conCommands.FindAll(ConCommand => ConCommand.name.StartsWith(inputName))
+                                                          .Where(ConCommand => !ConCommand.flags.HasFlag(ConFlags.Hidden))
                                                           .Select(ConCommand => ConCommand.name)
                                                           .ToList();
 
                 //add all matching convars
                 matchingEntries.AddRange(Ascalon.instance.conVars.FindAll(ConVar => ConVar.name.StartsWith(inputName))
+                                               .Where(ConVar => !ConVar.flags.HasFlag(ConFlags.Hidden))
                                                .Select(ConVar => ConVar.name + " " + (ConVar.flags.HasFlag(ConFlags.Sensitive) ? "(PROTECTED)" : AscalonUtil.ConVarDataToString(ConVar.GetData())))
                                                .ToList());
 

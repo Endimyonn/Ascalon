@@ -37,6 +37,9 @@ public enum ConFlags
     RunOnServer = 256,
     //This command should be sent to the server for calling. Do not use on ConVars unless only 2 players may be connected at a time. Do not combine with ClientReplicated or you will experience infinite loops.
 
-    NoRCon = 512
+    NoRCon = 512,
     //This command or ConVar cannot be called by RCon.
+
+    Hidden = 1024
+    //This command or ConVar should be hidden from players (doesn't show up in searches, help listings, etc)
 }

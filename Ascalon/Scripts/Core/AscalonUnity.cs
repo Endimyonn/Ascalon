@@ -17,6 +17,10 @@ public class AscalonUnity : MonoBehaviour
     //[SerializeField] private AscalonNetModule netModule;
     public GameObject uiFeedEntryPrefab;
 
+    //settings
+    public string mainConfigName = "config";
+    public bool loadConfigUnityStyle = true;
+
     private void Awake()
     {
         if (instance != null)
@@ -33,6 +37,10 @@ public class AscalonUnity : MonoBehaviour
         //so they must be hardcoded here for now.
         ascalonInstance.uiModule = new DebugFeed();
         ascalonInstance.netModule = new AscalonMirrorNet();
+
+        //settings
+        ascalonInstance.mainConfigName = mainConfigName;
+        ascalonInstance.loadConfigUnityStyle = loadConfigUnityStyle;
 
         ascalonInstance.Initialize();
     }

@@ -25,6 +25,11 @@ public class ConRelCommands
 
         if (Ascalon.ConCommandExists(argEntryName))
         {
+            if (findCommand.flags.HasFlag(ConFlags.Hidden))
+            {
+                Ascalon.Log("No such command or ConVar \"" + argEntryName + "\"", "", LogMode.Error);
+                return;
+            }
             string parmsString = "";
             System.Tuple<string, string>[] commandParms = AscalonUtil.ParmsNamesToStrings(findCommand.parms);
 
@@ -67,6 +72,11 @@ public class ConRelCommands
         }
         else if (Ascalon.ConVarExists(argEntryName))
         {
+            if (findConVar.flags.HasFlag(ConFlags.Hidden))
+            {
+                Ascalon.Log("No such command or ConVar \"" + argEntryName + "\"", "", LogMode.Error);
+                return;
+            }
             string dataString = AscalonUtil.ConVarDataToString(findConVar.GetData());
             string flagsString = "";
             if (findConVar.flags == 0)

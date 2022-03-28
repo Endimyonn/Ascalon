@@ -164,7 +164,7 @@ public class TestCommands
     [ConCommand("test_rpctoserver", ConFlags.RunOnServer)]
     static void cmd_test_rpctoserver(string argBroadcast)
     {
-        Ascalon.Log(argBroadcast);
+        Debug.Log(argBroadcast);
     }
 
     [ConVar("test_repvar", "Replicated variable test", ConFlags.ClientReplicated | ConFlags.ServerOnly)]

@@ -137,16 +137,6 @@ public partial class Ascalon
             gatherTime.Seconds,
             gatherTime.Milliseconds / 10));*/
 
-        //load config
-        if (!loadConfigUnityStyle)
-        {
-            AscalonConfigTools.ReadConfig(mainConfigDirectory + mainConfigName);
-        }
-        else
-        {
-            AscalonConfigTools.ReadConfigUnity(mainConfigName);
-        }
-
         //initialize modules
         if (uiModule != null)
         {
@@ -166,6 +156,16 @@ public partial class Ascalon
 
         rconServer = new AscalonRConServer();
         rconServer.StartListening();
+
+        //load config
+        if (!loadConfigUnityStyle)
+        {
+            AscalonConfigTools.ReadConfig(mainConfigDirectory + mainConfigName);
+        }
+        else
+        {
+            AscalonConfigTools.ReadConfigUnity(mainConfigName);
+        }
 
         ready = true;
     }
@@ -241,7 +241,7 @@ public partial class Ascalon
             }
 
             //check ConFlags and context before proceeding
-            bool flagsPassed = Ascalon.instance.ValidateFlags(argContext, findConObject.flags);
+            bool flagsPassed = Ascalon.instance.ValidateFlags(argContext, findConObject.flags, inputName, argInput);
             bool contextPassed = Ascalon.instance.ValidateContext(argContext, findConObject.flags);
 
 
@@ -252,7 +252,7 @@ public partial class Ascalon
                 if (flagsPassed && contextPassed)
                 {
                     //send call to server if it is marked to be ran on server
-                    if (findConObject.flags.HasFlag(ConFlags.RunOnServer) && AscalonNetModule.GetRole() != NetRole.Server)
+                    if (findConObject.flags.HasFlag(ConFlags.RunOnServer) && AscalonNetModule.GetRole() != NetRole.Server && argContext.source != AscalonCallSource.Server)
                     {
                         instance.netModule.NetCall(argInput, new AscalonCallContext(AscalonNetModule.GetRole()), new AscalonCallNetTarget(NetRole.Server));
                         return;
@@ -476,7 +476,7 @@ public partial class Ascalon
     }
 
     //validate flags on a call
-    bool ValidateFlags(AscalonCallContext argContext, ConFlags argFlags)
+    bool ValidateFlags(AscalonCallContext argContext, ConFlags argFlags, string argCallName, string argCall)
     {
         if (argFlags.HasFlag(ConFlags.Cheat))
         {
@@ -532,6 +532,15 @@ public partial class Ascalon
             if (argFlags.HasFlag(ConFlags.NoRCon))
             {
                 Ascalon.Log("RCon call was made for command or ConVar that disallows RCon.", LogMode.WarningVerbose);
+                return false;
+            }
+        }
+
+        if (argFlags.HasFlag(ConFlags.Hidden))
+        {
+            if (argContext.source != AscalonCallSource.Internal)
+            {
+                Ascalon.Log("Error: no such command or ConVar '" + argCallName.ToLower() + "'", "The command or ConVar entered does not exist.\nOriginal received string: " + argCall, LogMode.Error);
                 return false;
             }
         }

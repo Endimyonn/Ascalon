@@ -21,7 +21,14 @@ public class AscalonMirrorNet : AscalonNetModule
         //if the network isn't fully initialized, do so
         if (debugRPCs == null)
         {
-            debugRPCs = NetworkClient.localPlayer.gameObject.GetComponent<AscalonMirrorRPCs>();
+            if (Application.isBatchMode)
+            {
+                debugRPCs = GameObject.Find("dedicated server RPCs").GetComponent<AscalonMirrorRPCs>();
+            }
+            else
+            {
+                debugRPCs = NetworkClient.localPlayer.gameObject.GetComponent<AscalonMirrorRPCs>();
+            }
         }
 
         if (debugRPCs == null)
@@ -104,9 +111,9 @@ public class AscalonMirrorNet : AscalonNetModule
             if (conVar.flags.HasFlag(ConFlags.ClientReplicated))
             {
                 debugRPCs.RpcReplicateToClient(
-                    GameObject.Find(argTarget.targetClient).GetComponent<NetworkIdentity>().connectionToClient,
-                    conVar.name + " " + AscalonUtil.ConVarDataToString(conVar.GetData()),
-                    new AscalonCallContext(AscalonCallSource.Server)
+                    GameObject.Find(argTarget.targetClient).GetComponent<NetworkIdentity>().connectionToClient, //client connection ID
+                    conVar.name + " " + AscalonUtil.ConVarDataToString(conVar.GetData()),                       //replication call
+                    new AscalonCallContext(AscalonCallSource.Server)                                            //context
                     );
             }
         }
@@ -122,16 +129,21 @@ public class AscalonMirrorNet : AscalonNetModule
 
         InitializeNet();
 
-        //todo: fix
         foreach (ConVar conVar in Ascalon.instance.conVars)
         {
             if (conVar.flags.HasFlag(ConFlags.ClientReplicated))
             {
                 //do not replicate to the server
-                if (argClient.connectionId != NetworkClient.connection.connectionId)
+                if (NetworkClient.active)
                 {
-                    debugRPCs.RpcReplicateToClient(argClient, conVar.name + " " + AscalonUtil.ConVarDataToString(conVar.GetData()), new AscalonCallContext(AscalonCallSource.Server));
+                    if (argClient.connectionId == NetworkClient.connection.connectionId)
+                    {
+                        return; //do not replicate to the same client if we are running in Host mode
+                    }
                 }
+
+                //replicate
+                debugRPCs.RpcReplicateToClient(argClient, conVar.name + " " + AscalonUtil.ConVarDataToString(conVar.GetData()), new AscalonCallContext(AscalonCallSource.Server));
             }
         }
     }
