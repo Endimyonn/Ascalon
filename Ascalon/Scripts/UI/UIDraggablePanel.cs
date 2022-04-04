@@ -7,31 +7,36 @@ using UnityEngine.EventSystems;
 //Simple class to create draggable windows. Add a grab area as a panel, attach script to it,
 //choose targeting mode.
 
-public class UIDraggablePanel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class UIDraggablePanel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
-    private bool dragging = false;
-
     private Vector3 dragOffset;
 
     public DragType dragMode = DragType.This;
-    private Transform targetPanel;
+    private RectTransform targetPanel;
     public GameObject targetObject;
     private RectTransform localBounds;
 
+    public bool lockWindowToCanvas = true;
+
+    [Tooltip("The Canvas this panel belongs to. Necessary to determine if this is screenspace or worldspace.")]
+    public Canvas canvas;
+    private bool canvasIsWorldSpace;
+
     private void Awake()
     {
+        canvasIsWorldSpace = canvas.renderMode == RenderMode.WorldSpace;
         switch (dragMode)
         {
             case DragType.This:
-                targetPanel = transform;
+                targetPanel = transform as RectTransform;
                 break;
 
             case DragType.Parent:
-                targetPanel = transform.parent;
+                targetPanel = transform.parent as RectTransform;
                 break;
 
             case DragType.Custom:
-                targetPanel = targetObject.transform;
+                targetPanel = targetObject.transform as RectTransform;
                 break;
         }
 
@@ -40,21 +45,44 @@ public class UIDraggablePanel : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     void Update()
     {
-        if (dragging)
+        
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (!canvasIsWorldSpace)
         {
             targetPanel.position = new Vector3(Input.mousePosition.x, Input.mousePosition.y) - dragOffset;
+        }
+        else
+        {
+            Vector3 newPosition;
+            RectTransformUtility.ScreenPointToWorldPointInRectangle(canvas.transform as RectTransform, Input.mousePosition, canvas.worldCamera, out newPosition);
+            newPosition.z = 0;
+            Debug.Log("hit " + newPosition.ToString());
+            //targetPanel.localPosition = newPosition;
+            targetPanel.localPosition = canvas.transform.TransformPoint(newPosition);
         }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        dragOffset = new Vector3(eventData.position.x, eventData.position.y) - targetPanel.transform.position;
-        dragging = true;
+        if (!canvasIsWorldSpace)
+        {
+            dragOffset = new Vector3(eventData.position.x, eventData.position.y) - targetPanel.transform.position;
+        }
+        else
+        {
+            Vector3 oldOffset = dragOffset;
+            RectTransformUtility.ScreenPointToWorldPointInRectangle(canvas.transform as RectTransform, eventData.position, canvas.worldCamera, out dragOffset);
+            dragOffset -= targetPanel.transform.localPosition;
+            Debug.Log("Offset altered: old is " + oldOffset.ToString() + " new is " + dragOffset.ToString());
+        }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        dragging = false;
+        
 
         //todo: keep the drag bar within current screen bounds
     }
