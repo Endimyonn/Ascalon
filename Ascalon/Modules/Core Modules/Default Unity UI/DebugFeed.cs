@@ -139,93 +139,101 @@ public class DebugFeed : AscalonUIModule
             argContent = "";    //avoid NullReferenceExceptions
         }
 
-        switch (argType) //add entry
+        try
         {
-            case LogMode.Info:
-                GameObject newEntryInfo = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform); //todo: the second var is missingreference on scene reload, but apparently not in editor?? why???
-                newEntryInfo.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                newEntryInfo.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
-                newEntryInfo.transform.GetChild(2).gameObject.SetActive(true);
-                break;
+            switch (argType) //add entry
+            {
+                case LogMode.Info:
+                    GameObject newEntryInfo = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform); //todo: the second var is missingreference on scene reload, but apparently not in editor?? why???
+                    newEntryInfo.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                    newEntryInfo.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
+                    newEntryInfo.transform.GetChild(2).gameObject.SetActive(true);
+                    break;
 
-            case LogMode.Warning:
-                GameObject newEntryWarning = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                newEntryWarning.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                newEntryWarning.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
-                newEntryWarning.transform.GetChild(3).gameObject.SetActive(true);
-                break;
+                case LogMode.Warning:
+                    GameObject newEntryWarning = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                    newEntryWarning.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                    newEntryWarning.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
+                    newEntryWarning.transform.GetChild(3).gameObject.SetActive(true);
+                    break;
 
-            case LogMode.Error:
-                GameObject newEntryError = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                newEntryError.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                newEntryError.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
-                newEntryError.transform.GetChild(4).gameObject.SetActive(true);
-                break;
+                case LogMode.Error:
+                    GameObject newEntryError = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                    newEntryError.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                    newEntryError.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
+                    newEntryError.transform.GetChild(4).gameObject.SetActive(true);
+                    break;
 
-            case LogMode.Assertion:
-                GameObject newEntryAssertion = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                newEntryAssertion.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                newEntryAssertion.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
-                newEntryAssertion.transform.GetChild(5).gameObject.SetActive(true);
-                break;
+                case LogMode.Assertion:
+                    GameObject newEntryAssertion = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                    newEntryAssertion.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                    newEntryAssertion.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
+                    newEntryAssertion.transform.GetChild(5).gameObject.SetActive(true);
+                    break;
 
-            case LogMode.Exception:
-                GameObject newEntryException = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                newEntryException.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                newEntryException.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
-                newEntryException.transform.GetChild(5).gameObject.SetActive(true);
-                break;
+                case LogMode.Exception:
+                    GameObject newEntryException = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                    newEntryException.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                    newEntryException.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
+                    newEntryException.transform.GetChild(5).gameObject.SetActive(true);
+                    break;
 
-            case LogMode.InfoVerbose:
-                if ((bool)Ascalon.GetConVar("con_verbose"))
-                {
-                    GameObject newEntryInfoVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                    newEntryInfoVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                    newEntryInfoVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
-                    newEntryInfoVerbose.transform.GetChild(2).gameObject.SetActive(true);
-                }
-                break;
+                case LogMode.InfoVerbose:
+                    if ((bool)Ascalon.GetConVar("con_verbose"))
+                    {
+                        GameObject newEntryInfoVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        newEntryInfoVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                        newEntryInfoVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
+                        newEntryInfoVerbose.transform.GetChild(2).gameObject.SetActive(true);
+                    }
+                    break;
 
-            case LogMode.WarningVerbose:
-                if ((bool)Ascalon.GetConVar("con_verbose"))
-                {
-                    GameObject newEntryWarningVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                    newEntryWarningVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                    newEntryWarningVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
-                    newEntryWarningVerbose.transform.GetChild(3).gameObject.SetActive(true);
-                }
-                break;
+                case LogMode.WarningVerbose:
+                    if ((bool)Ascalon.GetConVar("con_verbose"))
+                    {
+                        GameObject newEntryWarningVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        newEntryWarningVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                        newEntryWarningVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
+                        newEntryWarningVerbose.transform.GetChild(3).gameObject.SetActive(true);
+                    }
+                    break;
 
-            case LogMode.ErrorVerbose:
-                if ((bool)Ascalon.GetConVar("con_verbose"))
-                {
-                    GameObject newEntryErrorVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                    newEntryErrorVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                    newEntryErrorVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
-                    newEntryErrorVerbose.transform.GetChild(4).gameObject.SetActive(true);
-                }
-                break;
+                case LogMode.ErrorVerbose:
+                    if ((bool)Ascalon.GetConVar("con_verbose"))
+                    {
+                        GameObject newEntryErrorVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        newEntryErrorVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                        newEntryErrorVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
+                        newEntryErrorVerbose.transform.GetChild(4).gameObject.SetActive(true);
+                    }
+                    break;
 
-            case LogMode.AssertionVerbose:
-                if ((bool)Ascalon.GetConVar("con_verbose"))
-                {
-                    GameObject newEntryAssertionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                    newEntryAssertionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                    newEntryAssertionVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
-                    newEntryAssertionVerbose.transform.GetChild(5).gameObject.SetActive(true);
-                }
-                break;
+                case LogMode.AssertionVerbose:
+                    if ((bool)Ascalon.GetConVar("con_verbose"))
+                    {
+                        GameObject newEntryAssertionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        newEntryAssertionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                        newEntryAssertionVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
+                        newEntryAssertionVerbose.transform.GetChild(5).gameObject.SetActive(true);
+                    }
+                    break;
 
-            case LogMode.ExceptionVerbose:
-                if ((bool)Ascalon.GetConVar("con_verbose"))
-                {
-                    GameObject newEntryExceptionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
-                    newEntryExceptionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
-                    newEntryExceptionVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
-                    newEntryExceptionVerbose.transform.GetChild(5).gameObject.SetActive(true);
-                }
-                break;
+                case LogMode.ExceptionVerbose:
+                    if ((bool)Ascalon.GetConVar("con_verbose"))
+                    {
+                        GameObject newEntryExceptionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        newEntryExceptionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
+                        newEntryExceptionVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
+                        newEntryExceptionVerbose.transform.GetChild(5).gameObject.SetActive(true);
+                    }
+                    break;
+            }
         }
+        catch (Exception issue)
+        {
+            Debug.Log("Exception occurred while trying to log data with Ascalon: " + issue.Message);
+        }
+        
 
         //don't keep too many entries to prevent lag from buildup
         if (this.uiDebugLogContent.transform.childCount > this.uiMaxFeedEntries)
