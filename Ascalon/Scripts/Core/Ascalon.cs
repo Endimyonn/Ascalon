@@ -592,6 +592,16 @@ public partial class Ascalon
             return false;
         }
 
+        if (argContext.source == AscalonCallSource.RCon)
+        {
+            if ((bool)Ascalon.GetConVar("rcon_acceptincoming") == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         return false;
     }
 

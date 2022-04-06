@@ -17,7 +17,10 @@ using System.Text.Json.Serialization;
 //built to support it over the network
 public class AscalonRConModule
 {
-    [ConVar("rcon_password", "RCon password", ConFlags.Sensitive)]
+    [ConVar("rcon_acceptincoming", "Allow incoming RCon calls to execute", ConFlags.Save | ConFlags.NoRCon)]
+    static ConVar cvar_rcon_acceptincoming = new ConVar(false);
+
+    [ConVar("rcon_password", "RCon password", ConFlags.Sensitive | ConFlags.NoRCon)]
     static ConVar cvar_rcon_password = new ConVar("");
 
     [ConVar("rcon_address", "The address to send RCon requests to")]
@@ -26,7 +29,7 @@ public class AscalonRConModule
     [ConVar("rcon_port", "The port to send RCon requests to")]
     static ConVar cvar_rcon_port = new ConVar(7701);
 
-    [ConCommand("rcon", "Send an RCon command")]
+    [ConCommand("rcon", "Send an RCon command", ConFlags.NoRCon)]
     static void cmd_rcon(string argCall)
     {
         //create TcpClient, try to establish connection to remote

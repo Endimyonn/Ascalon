@@ -34,7 +34,7 @@ public class UnityWhisperer : MonoBehaviour
             lock (backlog)
             {
                 //transfer the backlog to the active queue, then empty the backlog
-                actionQueue = backlog;
+                actionQueue.AddRange(backlog);
                 backlog.Clear();
 
                 queueHasActions = false;
