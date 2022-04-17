@@ -1,19 +1,20 @@
 # Ascalon
-Ascalon (formerly DebugCore) is a modular, extensible tool providing a system which can create and interact with ConCommands, ConVars.
+Ascalon is a modular, extensible tool providing a system which can create and interact with ConCommands and ConVars, and provide a Debug Console experience similar to those found in AAA games.
 
 Ascalon is designed for Unity, but can be run with minimal changes in any C# environment supporting reflections.
 
 ## Quick start
-Ascalon can be quickly set up by adding it as a submodule to a project, or directly importing it into a Unity/C# project. Examples of how to define ConCommands, ConVars, and ConClasses can be found in `Scripts/StockCommands/BaseCommands.cs`.
+Ascalon can be quickly set up by adding it as a submodule to a project, or directly importing it into a Unity/C# project. Examples of how to define and use ConCommands and ConVars can be found in `Scripts/StockCommands/BaseCommands.cs`.
 
-To call a ConCommand or ConVar, run `DebugCore.Call("<command> <args>")`.
+To call a ConCommand or ConVar, run `Ascalon.Call("<command> <args>")`.
 
 ## Features
 - ConCommands
 - ConVars
 - Command processor
-- Networking support
+- Save/load ConVars as config files
 - Flags for access control
+- Networking support
 
 ## Planned features
 - Networking support
