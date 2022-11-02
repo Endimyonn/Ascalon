@@ -1,3 +1,4 @@
+#if MIRROR
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -55,3 +56,4 @@ public class AscalonMirrorRPCs : NetworkBehaviour
         Ascalon.Call(argCall, argContext);
     }
 }
+#endif

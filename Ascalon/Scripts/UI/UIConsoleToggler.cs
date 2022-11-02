@@ -2,21 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using Rewired;
 
 //Attach to a canvas with a Window as a child. Kind of hacky, but it works
 
 public class UIConsoleToggler : MonoBehaviour
 {
-    public string toggleButtonName;
     public TMP_InputField inputField;
     private bool active;
 
-    public Rewired.Player playerInput;
-
     private void Awake()
     {
-        playerInput = ReInput.players.GetPlayer(0);
+        
     }
 
     private void Start()
@@ -27,7 +23,7 @@ public class UIConsoleToggler : MonoBehaviour
     private void Update()
     {
         //do we need to toggle?
-        if (playerInput.GetButtonDown("ToggleConsole"))
+        if (Input.GetKeyDown(KeyCode.BackQuote))
         {
             if (!inputField.isFocused)
             {
