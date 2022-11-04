@@ -241,7 +241,7 @@ public class DebugFeed : AscalonUIModule
             int numToRemove = (this.uiDebugLogContent.transform.childCount - this.uiMaxFeedEntries);
             for (int i = 0; i < numToRemove; i++)
             {
-                GameObject.DestroyImmediate(this.uiDebugLogContent.transform.GetChild(0 + i).gameObject);
+                GameObject.DestroyImmediate(this.uiDebugLogContent.transform.GetChild(0).gameObject);
             }
         }
     }
