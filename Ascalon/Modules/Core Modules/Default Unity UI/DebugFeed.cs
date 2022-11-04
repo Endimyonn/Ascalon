@@ -238,7 +238,11 @@ public class DebugFeed : AscalonUIModule
         //don't keep too many entries to prevent lag from buildup
         if (this.uiDebugLogContent.transform.childCount > this.uiMaxFeedEntries)
         {
-            GameObject.Destroy(this.uiDebugLogContent.transform.GetChild(0).gameObject);
+            int numToRemove = (this.uiDebugLogContent.transform.childCount - this.uiMaxFeedEntries);
+            for (int i = 0; i < numToRemove; i++)
+            {
+                GameObject.DestroyImmediate(this.uiDebugLogContent.transform.GetChild(0 + i).gameObject);
+            }
         }
     }
 
