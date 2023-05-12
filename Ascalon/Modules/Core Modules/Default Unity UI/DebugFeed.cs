@@ -34,9 +34,9 @@ public class DebugFeed : AscalonUIModule
     private PointerEventData uiPointerEventData;
 
     //entry visibility
-    private bool infoVisible = true;
-    private bool warningVisible = true;
-    private bool errorVisible = true;
+    public bool infoVisible = true;
+    public bool warningVisible = true;
+    public bool errorVisible = true;
 
     //limit number of entries
     public int uiMaxFeedEntries = 150;
@@ -148,6 +148,7 @@ public class DebugFeed : AscalonUIModule
                     newEntryInfo.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryInfo.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                     newEntryInfo.transform.GetChild(2).gameObject.SetActive(true);
+                    newEntryInfo.SetActive(infoVisible);
                     break;
 
                 case LogMode.Warning:
@@ -155,6 +156,7 @@ public class DebugFeed : AscalonUIModule
                     newEntryWarning.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryWarning.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                     newEntryWarning.transform.GetChild(3).gameObject.SetActive(true);
+                    newEntryWarning.SetActive(warningVisible);
                     break;
 
                 case LogMode.Error:
@@ -162,6 +164,7 @@ public class DebugFeed : AscalonUIModule
                     newEntryError.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryError.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                     newEntryError.transform.GetChild(4).gameObject.SetActive(true);
+                    newEntryError.SetActive(errorVisible);
                     break;
 
                 case LogMode.Assertion:
@@ -169,6 +172,7 @@ public class DebugFeed : AscalonUIModule
                     newEntryAssertion.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryAssertion.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                     newEntryAssertion.transform.GetChild(5).gameObject.SetActive(true);
+                    newEntryAssertion.SetActive(errorVisible);
                     break;
 
                 case LogMode.Exception:
@@ -176,6 +180,7 @@ public class DebugFeed : AscalonUIModule
                     newEntryException.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryException.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
                     newEntryException.transform.GetChild(5).gameObject.SetActive(true);
+                    newEntryException.SetActive(errorVisible);
                     break;
 
                 case LogMode.InfoVerbose:
@@ -185,6 +190,7 @@ public class DebugFeed : AscalonUIModule
                         newEntryInfoVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryInfoVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                         newEntryInfoVerbose.transform.GetChild(2).gameObject.SetActive(true);
+                        newEntryInfoVerbose.SetActive(infoVisible);
                     }
                     break;
 
@@ -195,6 +201,7 @@ public class DebugFeed : AscalonUIModule
                         newEntryWarningVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryWarningVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                         newEntryWarningVerbose.transform.GetChild(3).gameObject.SetActive(true);
+                        newEntryWarningVerbose.SetActive(warningVisible);
                     }
                     break;
 
@@ -205,6 +212,7 @@ public class DebugFeed : AscalonUIModule
                         newEntryErrorVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryErrorVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                         newEntryErrorVerbose.transform.GetChild(4).gameObject.SetActive(true);
+                        newEntryErrorVerbose.SetActive(errorVisible);
                     }
                     break;
 
@@ -215,6 +223,7 @@ public class DebugFeed : AscalonUIModule
                         newEntryAssertionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryAssertionVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                         newEntryAssertionVerbose.transform.GetChild(5).gameObject.SetActive(true);
+                        newEntryAssertionVerbose.SetActive(errorVisible);
                     }
                     break;
 
@@ -225,6 +234,7 @@ public class DebugFeed : AscalonUIModule
                         newEntryExceptionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryExceptionVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
                         newEntryExceptionVerbose.transform.GetChild(5).gameObject.SetActive(true);
+                        newEntryExceptionVerbose.SetActive(errorVisible);
                     }
                     break;
             }

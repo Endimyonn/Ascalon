@@ -121,9 +121,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DebugFeed, Assembly-CSharp
-        m_MethodName: ToggleWarningEntries
+      - m_Target: {fileID: 5593494959998171989}
+        m_TargetAssemblyTypeName: DebugFeedUIProxy, Assembly-CSharp
+        m_MethodName: ToggleShowEntriesWarning
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -303,7 +303,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 26676}
+  m_AnchoredPosition: {x: 0, y: 50802}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3467910039318063693
@@ -924,6 +924,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc012ca79b25524782ce21242a3a51a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  infoFilterBackground: {fileID: 8598190869310877649}
+  warningFilterBackground: {fileID: 5744824037200913697}
+  errorFilterBackground: {fileID: 5470553582042876922}
 --- !u!114 &8073377226706576663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1502,9 +1505,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DebugFeed, Assembly-CSharp
-        m_MethodName: ToggleInfoEntries
+      - m_Target: {fileID: 5593494959998171989}
+        m_TargetAssemblyTypeName: DebugFeedUIProxy, Assembly-CSharp
+        m_MethodName: ToggleShowEntriesInfo
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1730,9 +1733,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DebugFeed, Assembly-CSharp
-        m_MethodName: Clear
+      - m_Target: {fileID: 5593494959998171989}
+        m_TargetAssemblyTypeName: DebugFeedUIProxy, Assembly-CSharp
+        m_MethodName: ClearEntries
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2096,9 +2099,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DebugFeed, Assembly-CSharp
-        m_MethodName: ToggleErrorEntries
+      - m_Target: {fileID: 5593494959998171989}
+        m_TargetAssemblyTypeName: DebugFeedUIProxy, Assembly-CSharp
+        m_MethodName: ToggleShowEntriesError
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
