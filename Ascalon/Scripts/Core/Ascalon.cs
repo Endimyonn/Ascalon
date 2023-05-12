@@ -187,7 +187,7 @@ public partial class Ascalon
         }
 
         //remove beginning and trailing whitespace
-        argInput.Trim();
+        argInput = argInput.Trim();
 
         //process the command and split it into an array of terms
         object[] inputParms = instance.GetInputParms(argInput).ToArray();

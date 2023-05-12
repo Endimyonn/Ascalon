@@ -303,7 +303,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 25704}
+  m_AnchoredPosition: {x: 0, y: 25626}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3467910039318063693
@@ -2314,6 +2314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32b89c9fb6d6d7a4e9c3de01b80167df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toggleButtonName: ToggleConsole
   inputField: {fileID: 7384995141116178228}
 --- !u!114 &2834565579084779729
 MonoBehaviour:
