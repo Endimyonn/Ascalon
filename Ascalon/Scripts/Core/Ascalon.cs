@@ -456,7 +456,9 @@ public partial class Ascalon
                 }
                 else
                 {
+                    result.valid = false;
                     result.failureReason = parseResult.failureReason;
+                    result.customErrorMessage = parseResult.customErrorMessage;
                     foreach (Tuple<string, string, int> mismatchedParm in result.mismatchedParms)
                     {
                         result.mismatchedParms.Add(mismatchedParm);
