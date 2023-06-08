@@ -17,7 +17,8 @@ public class DebugFeed : AscalonUIModule
     [SerializeField] private TMP_InputField uiInputField;
 
     [SerializeField] private GameObject uiDebugLogPanel;
-    public GameObject uiDebugLogContent;
+    public RectTransform uiDebugLogContent;
+    private RectTransform uiDebugLogViewport;
 
     [SerializeField] private GameObject uiTooltipPanel;
     [SerializeField] private TextMeshProUGUI uiTooltipText;
@@ -52,7 +53,8 @@ public class DebugFeed : AscalonUIModule
 
         uiInputField = AscalonUnity.instance.transform.GetChild(0).Find("Command Entry").GetComponent<TMP_InputField>();
         uiDebugLogPanel = AscalonUnity.instance.transform.GetChild(0).gameObject;
-        uiDebugLogContent = AscalonUnity.instance.transform.GetChild(0).Find("Viewport").Find("Content").gameObject;
+        uiDebugLogContent = AscalonUnity.instance.transform.GetChild(0).Find("Viewport").Find("Content").GetComponent<RectTransform>();
+        uiDebugLogViewport = uiDebugLogContent.transform.parent.GetComponent<RectTransform>();
         uiTooltipPanel = AscalonUnity.instance.transform.GetChild(1).gameObject;
         uiTooltipText = AscalonUnity.instance.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>();
         uiSuggestionPanel = AscalonUnity.instance.transform.GetChild(0).Find("Command Entry").Find("Suggestions Panel").gameObject;
@@ -106,8 +108,6 @@ public class DebugFeed : AscalonUIModule
                 uiTooltipPanel.SetActive(false);
             }
         }
-
-        //todo: reimplement scroll-to-bottom-if-at-bottom
     }
 
 
@@ -139,12 +139,22 @@ public class DebugFeed : AscalonUIModule
             argContent = "";    //avoid NullReferenceExceptions
         }
 
+        //do we need to scroll to the bottom after this?
+        bool atBottom = false;
+        Vector3[] viewportCorners = new Vector3[4];
+        uiDebugLogViewport.GetWorldCorners(viewportCorners);
+        float viewportHeight = Mathf.Abs(viewportCorners[1].y - viewportCorners[0].y);
+        if (Mathf.Abs(uiDebugLogContent.localPosition.y - (uiDebugLogContent.sizeDelta.y - viewportHeight)) < 0.1f)
+        {
+            atBottom = true;
+        }
+
         try
         {
             switch (argType) //add entry
             {
                 case LogMode.Info:
-                    GameObject newEntryInfo = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform); //todo: the second var is missingreference on scene reload, but apparently not in editor?? why???
+                    GameObject newEntryInfo = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent); //todo: the second var is missingreference on scene reload, but apparently not in editor?? why???
                     newEntryInfo.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryInfo.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                     newEntryInfo.transform.GetChild(2).gameObject.SetActive(true);
@@ -152,7 +162,7 @@ public class DebugFeed : AscalonUIModule
                     break;
 
                 case LogMode.Warning:
-                    GameObject newEntryWarning = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                    GameObject newEntryWarning = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                     newEntryWarning.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryWarning.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                     newEntryWarning.transform.GetChild(3).gameObject.SetActive(true);
@@ -160,7 +170,7 @@ public class DebugFeed : AscalonUIModule
                     break;
 
                 case LogMode.Error:
-                    GameObject newEntryError = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                    GameObject newEntryError = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                     newEntryError.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryError.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                     newEntryError.transform.GetChild(4).gameObject.SetActive(true);
@@ -168,7 +178,7 @@ public class DebugFeed : AscalonUIModule
                     break;
 
                 case LogMode.Assertion:
-                    GameObject newEntryAssertion = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                    GameObject newEntryAssertion = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                     newEntryAssertion.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryAssertion.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                     newEntryAssertion.transform.GetChild(5).gameObject.SetActive(true);
@@ -176,7 +186,7 @@ public class DebugFeed : AscalonUIModule
                     break;
 
                 case LogMode.Exception:
-                    GameObject newEntryException = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                    GameObject newEntryException = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                     newEntryException.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                     newEntryException.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
                     newEntryException.transform.GetChild(5).gameObject.SetActive(true);
@@ -186,7 +196,7 @@ public class DebugFeed : AscalonUIModule
                 case LogMode.InfoVerbose:
                     if ((bool)Ascalon.GetConVar("con_verbose"))
                     {
-                        GameObject newEntryInfoVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        GameObject newEntryInfoVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                         newEntryInfoVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryInfoVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                         newEntryInfoVerbose.transform.GetChild(2).gameObject.SetActive(true);
@@ -197,7 +207,7 @@ public class DebugFeed : AscalonUIModule
                 case LogMode.WarningVerbose:
                     if ((bool)Ascalon.GetConVar("con_verbose"))
                     {
-                        GameObject newEntryWarningVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        GameObject newEntryWarningVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                         newEntryWarningVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryWarningVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                         newEntryWarningVerbose.transform.GetChild(3).gameObject.SetActive(true);
@@ -208,7 +218,7 @@ public class DebugFeed : AscalonUIModule
                 case LogMode.ErrorVerbose:
                     if ((bool)Ascalon.GetConVar("con_verbose"))
                     {
-                        GameObject newEntryErrorVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        GameObject newEntryErrorVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                         newEntryErrorVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryErrorVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                         newEntryErrorVerbose.transform.GetChild(4).gameObject.SetActive(true);
@@ -219,7 +229,7 @@ public class DebugFeed : AscalonUIModule
                 case LogMode.AssertionVerbose:
                     if ((bool)Ascalon.GetConVar("con_verbose"))
                     {
-                        GameObject newEntryAssertionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        GameObject newEntryAssertionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                         newEntryAssertionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryAssertionVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = argContent;
                         newEntryAssertionVerbose.transform.GetChild(5).gameObject.SetActive(true);
@@ -230,7 +240,7 @@ public class DebugFeed : AscalonUIModule
                 case LogMode.ExceptionVerbose:
                     if ((bool)Ascalon.GetConVar("con_verbose"))
                     {
-                        GameObject newEntryExceptionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent.transform);
+                        GameObject newEntryExceptionVerbose = GameObject.Instantiate(this.uiFeedEntryPrefab, this.uiDebugLogContent);
                         newEntryExceptionVerbose.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = argTitle;
                         newEntryExceptionVerbose.transform.GetChild(1).gameObject.GetComponent<TooltipStorage>().tooltip = "";
                         newEntryExceptionVerbose.transform.GetChild(5).gameObject.SetActive(true);
@@ -254,6 +264,17 @@ public class DebugFeed : AscalonUIModule
                 GameObject.DestroyImmediate(this.uiDebugLogContent.transform.GetChild(0).gameObject);
             }
         }
+
+        if (atBottom)
+        {
+            AscalonUnity.instance.StartCoroutine(this.ScrollToBottom());
+        }
+    }
+
+    private IEnumerator ScrollToBottom()
+    {
+        yield return new WaitForEndOfFrame();
+        uiDebugLogContent.localPosition = new Vector3(uiDebugLogContent.localPosition.x, uiDebugLogContent.sizeDelta.y);
     }
 
     //delegate member to handle builtin unity logs and add them as feed entries
