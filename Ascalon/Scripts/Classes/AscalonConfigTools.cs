@@ -86,7 +86,14 @@ public class AscalonConfigTools
             {
                 if (line.Length > 0 && line.Substring(0, 2) != "//") //filter blank lines and comments
                 {
-                    Ascalon.Call(line, new AscalonCallContext(AscalonCallSource.Internal));
+                    try
+                    {
+                        Ascalon.Call(line, new AscalonCallContext(AscalonCallSource.Internal));
+                    }
+                    catch (Exception e)
+                    {
+                        Ascalon.Log("Exception while loading config line: " + e.Message, line);
+                    }
                 }
             }
         }

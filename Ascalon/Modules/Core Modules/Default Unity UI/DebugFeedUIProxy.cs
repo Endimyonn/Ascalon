@@ -52,6 +52,11 @@ public class DebugFeedUIProxy : MonoBehaviour
         }
     }
 
+    public void ScrollToBottom()
+    {
+        (Ascalon.instance.uiModule as DebugFeed).ScrollToBottom();
+    }
+
     public void UpdateSuggestions()
     {
         (Ascalon.instance.uiModule as DebugFeed).UpdateSuggestions();

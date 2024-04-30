@@ -34,6 +34,11 @@ public class ConVar
         }
     }
 
+    public virtual void SetDataSimple(object[] argData)
+    {
+        cvarData = argData[0];
+    }
+
     //function that is called when data is changed
     public System.Action<object, object> DataChanged { get; set; }
 

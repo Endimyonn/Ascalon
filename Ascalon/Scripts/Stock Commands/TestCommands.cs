@@ -119,7 +119,7 @@ public class TestCommands
             }
         }
 
-    };*/
+    };
 
     [ConCommand("obj_moveupfive", "Move a GameObject up 5 units", ConFlags.Cheat)]
     static void cmd_obj_moveupfive(GameObjectFinder argGameObject)
@@ -137,5 +137,5 @@ public class TestCommands
     };
 
     [ConVar("hud_showhints", "Show hint popups in-game", ConFlags.Save)]
-    static ConVar cvar_hud_showhints = new ConVar(true);
+    static ConVar cvar_hud_showhints = new ConVar(true);*/
 }

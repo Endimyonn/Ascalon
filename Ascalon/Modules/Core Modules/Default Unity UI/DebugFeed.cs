@@ -14,7 +14,7 @@ public class DebugFeed : AscalonUIModule
 
     //tracking
     //todo: sort better
-    [SerializeField] private TMP_InputField uiInputField;
+    public TMP_InputField uiInputField;
 
     [SerializeField] private GameObject uiDebugLogPanel;
     public RectTransform uiDebugLogContent;
@@ -73,9 +73,9 @@ public class DebugFeed : AscalonUIModule
 
     public override void Update()
     {
-        //tooltip logic
         if (uiDebugLogPanel.activeInHierarchy == true)
         {
+            //tooltip logic
             uiPointerEventData = new PointerEventData(uiEventSystem);
             uiPointerEventData.position = Input.mousePosition;
 
@@ -119,7 +119,7 @@ public class DebugFeed : AscalonUIModule
 
     public override void OnCallComplete(string argCallString, bool argSuccess, AscalonCallContext argContext)
     {
-        uiInputField.text = "";
+        
     }
 
 
@@ -267,14 +267,36 @@ public class DebugFeed : AscalonUIModule
 
         if (atBottom)
         {
-            AscalonUnity.instance.StartCoroutine(this.ScrollToBottom());
+            AscalonUnity.instance.StartCoroutine(this.ScrollToBottomDelayed());
         }
     }
 
-    private IEnumerator ScrollToBottom()
+    /// <summary>
+    /// Instantly scrolls the entry view to the bottom.
+    /// </summary>
+    public void ScrollToBottom()
     {
-        yield return new WaitForEndOfFrame();
-        uiDebugLogContent.localPosition = new Vector3(uiDebugLogContent.localPosition.x, uiDebugLogContent.sizeDelta.y);
+        uiDebugLogContent.localPosition = new Vector3(uiDebugLogContent.localPosition.x, uiDebugLogContent.sizeDelta.y, uiDebugLogContent.localPosition.z);
+    }
+
+    /// <summary>
+    /// Waits for end-of-frame, then scrolls the entry view to the bottom.
+    /// </summary>
+    /// <param name="argFrameDelay">The amount of time, in frame count, to wait. 0 waits until the end of the current frame.</param>
+    private IEnumerator ScrollToBottomDelayed(int argFrameDelay = 0)
+    {
+        if (argFrameDelay == 0)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        else if (argFrameDelay > 0)
+        {
+            for (int i = 0; i < argFrameDelay; i++)
+            {
+                yield return null;
+            }
+        }
+        uiDebugLogContent.localPosition = new Vector3(uiDebugLogContent.localPosition.x, uiDebugLogContent.sizeDelta.y, uiDebugLogContent.localPosition.z);
     }
 
     //delegate member to handle builtin unity logs and add them as feed entries
@@ -534,6 +556,10 @@ public class DebugFeed : AscalonUIModule
 
     public void Call(string argInput)
     {
+        //clear text
+        uiInputField.text = "";
+
+        //begin the call
         Ascalon.Call(argInput, new AscalonCallContext(AscalonCallSource.User));
     }
 
