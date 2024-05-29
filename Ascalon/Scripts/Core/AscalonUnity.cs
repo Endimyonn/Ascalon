@@ -1,3 +1,4 @@
+#if UNITY_2019_1_OR_NEWER
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,17 +10,17 @@ public class AscalonUnity : MonoBehaviour
     //singleton
     [HideInInspector] public static AscalonUnity instance;
 
+
     //core
     private static Ascalon ascalonInstance;
 
-    //modules to be used
-    //[SerializeField] private AscalonUIModule uiModule;
-    //[SerializeField] private AscalonNetModule netModule;
-    public GameObject uiFeedEntryPrefab;
 
-    //settings
+    [Header("Settings")]
+    public bool autoSaveOnQuit = true;
     public string mainConfigName = "config";
     public bool loadConfigUnityStyle = true;
+
+    public GameObject uiFeedEntryPrefab;
 
     private void Awake()
     {
@@ -36,11 +37,12 @@ public class AscalonUnity : MonoBehaviour
         //to allow non-Monobehaviour classes to be shown in the editor,
         //so they must be hardcoded here for now.
         ascalonInstance.uiModule = new DebugFeed();
-        ascalonInstance.netModule = new AscalonMirrorNet();
+        ascalonInstance.netModule = new AscalonEmptyNet();
 
         //settings
-        ascalonInstance.mainConfigName = mainConfigName;
-        ascalonInstance.loadConfigUnityStyle = loadConfigUnityStyle;
+        ascalonInstance.mainConfigName = this.mainConfigName;
+        ascalonInstance.loadConfigUnityStyle = this.loadConfigUnityStyle;
+        ascalonInstance.loadConfigGodotStyle = false;
 
         ascalonInstance.Initialize();
     }
@@ -54,4 +56,20 @@ public class AscalonUnity : MonoBehaviour
 
         ascalonInstance.netModule.Update();
     }
+
+    private void OnApplicationQuit()
+    {
+        if (autoSaveOnQuit == true)
+        {
+            if (ascalonInstance.loadConfigUnityStyle == true)
+            {
+                AscalonConfigTools.WriteConfigUnity("config");
+            }
+            else
+            {
+                AscalonConfigTools.WriteConfig("config");
+            }
+        }
+    }
 }
+#endif

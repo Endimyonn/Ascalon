@@ -1,3 +1,4 @@
+#if UNITY_2019_1_OR_NEWER
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -63,3 +64,4 @@ public class BaseCommands
         argGameObject.result.transform.position = new Vector3(argPosition[0], argPosition[1], argPosition[2]);
     }
 }
+#endif

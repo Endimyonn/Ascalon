@@ -50,13 +50,15 @@ public class AscalonRConServer
 
                         if (data.password == (string)Ascalon.GetConVar("rcon_password"))
                         {
-                            #if UNITY_2019_1_OR_NEWER
+                        #if UNITY_2019_1_OR_NEWER
                             //Unity doesn't let certain code run on a non-main thread, so we send the call back
                             //to the main thread to run.
                             UnityWhisperer.Run(() => Ascalon.Call(data.call, new AscalonCallContext(AscalonCallSource.RCon)));
-                            #else
+                        #elif GODOT
+                            GodotWhisperer.Run(() => Ascalon.Call(data.call, new AscalonCallContext(AscalonCallSource.RCon)));
+                        #else
                             Ascalon.Call(data.call, new AscalonCallContext(AscalonCallSource.RCon));
-                            #endif
+                        #endif
                         }
                         else
                         {

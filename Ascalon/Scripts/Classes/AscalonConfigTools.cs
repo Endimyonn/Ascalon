@@ -8,10 +8,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 #endif
 
+#if GODOT
+using Godot;
+#endif
+
 //Tools for writing and reading config files formatted for DebugCore
 
 public class AscalonConfigTools
 {
+    #region Writing
     public static async void WriteConfig(string argPath)
     {
         await Task.Run(() =>
@@ -46,7 +51,7 @@ public class AscalonConfigTools
     //Write a config in the persistent data path
     public static void WriteConfigUnity(string argFileName)
     {
-        #if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER
         //ensure config directory exists
         if (!Directory.Exists(Application.persistentDataPath + Path.DirectorySeparatorChar + "config"))
         {
@@ -54,11 +59,27 @@ public class AscalonConfigTools
         }
 
         WriteConfig(Application.persistentDataPath + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
-        #else
-        Ascalon.Log("Cannot write a config Unity-style outside of Unity!", LogType.Error);
-        #endif
+#else
+        Ascalon.Log("Cannot write a config Unity-style outside of Unity!", LogMode.Error);
+#endif
     }
 
+#if GODOT
+    //Write a config to user data
+    public static void WriteConfigGodot(string argFileName)
+    {
+        //ensure config directory exists
+        if (Directory.Exists(OS.GetUserDataDir() + Path.DirectorySeparatorChar + "config") == false)
+        {
+            Directory.CreateDirectory(OS.GetUserDataDir() + Path.DirectorySeparatorChar + "config");
+        }
+
+        WriteConfig(OS.GetUserDataDir() + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
+    }
+#endif
+#endregion
+
+    #region Reading
     public static void ReadConfig(string argPath, bool argSilent)
     {
         //handle bad config names
@@ -79,7 +100,7 @@ public class AscalonConfigTools
             return;
         }
 
-        using (System.IO.StreamReader reader = new System.IO.StreamReader(argPath))
+        using (StreamReader reader = new StreamReader(argPath))
         {
             string line = "";
             while ((line = reader.ReadLine()) != null)
@@ -104,19 +125,41 @@ public class AscalonConfigTools
         ReadConfig(argPath, false);
     }
 
+#if UNITY_2019_1_OR_NEWER
     //Read a config from the persistent data path
     public static void ReadConfigUnity(string argFileName)
     {
-        ReadConfig(Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argFileName + ".cfg");
+        ReadConfig(Application.persistentDataPath + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
     }
+#endif
 
+#if GODOT
+    //Read a config from user data
+    public static void ReadConfigGodot(string argFileName)
+    {
+        ReadConfig(OS.GetUserDataDir() + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
+    }
+#endif
+#endregion
+
+    #region Existence Checking
     public static bool ConfigExists(string argPath)
     {
         return File.Exists(argPath);
     }
 
+#if UNITY_2019_1_OR_NEWER
     public static bool ConfigExistsUnity(string argFileName)
     {
-        return ConfigExists(Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argFileName + ".cfg");
+        return ConfigExists(Application.persistentDataPath + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
     }
+#endif
+
+#if GODOT
+    public static bool ConfigExistsGodot(string argFileName)
+    {
+        return ConfigExists(OS.GetUserDataDir() + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + argFileName + ".cfg");
+    }
+#endif
+#endregion
 }

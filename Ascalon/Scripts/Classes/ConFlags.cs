@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 //This defines ConFlags, which are used for gating access to,
 //and controlling the usage of, commands and ConVars. This enum

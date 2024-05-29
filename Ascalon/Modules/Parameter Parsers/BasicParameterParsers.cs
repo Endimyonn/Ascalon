@@ -2,7 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine;
+#elif GODOT
+using Godot;
+#endif
 
 //This class defines several functions for command parameter
 //parsing. It includes handlers for many built-in datatypes.

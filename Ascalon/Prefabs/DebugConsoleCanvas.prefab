@@ -987,7 +987,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.000061035156}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1864573032921474833
@@ -2285,9 +2285,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbf4ac1ff3234aa4f9c5a5a0da288ba6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiFeedEntryPrefab: {fileID: 7637659564649481922, guid: f21597ea1e92dcf449215f50de3875e3, type: 3}
+  autoSaveOnQuit: 1
   mainConfigName: config
   loadConfigUnityStyle: 1
+  uiFeedEntryPrefab: {fileID: 7637659564649481922, guid: f21597ea1e92dcf449215f50de3875e3, type: 3}
 --- !u!114 &7232816745285563913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2892,7 +2893,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 336284732041787352}
   m_HandleRect: {fileID: 5218314533722154576}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3043,7 +3044,6 @@ GameObject:
   - component: {fileID: 87435161246777905}
   - component: {fileID: 8562741060484631950}
   - component: {fileID: 1391457622016716411}
-  - component: {fileID: 1051116510509735309}
   m_Layer: 5
   m_Name: DebugConsoleCanvas
   m_TagString: Untagged
@@ -3147,18 +3147,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputField: {fileID: 5745734895127880296}
---- !u!114 &1051116510509735309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7591819865887850304}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9eb59ff3e5975846a44ebc7d81429d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8172660101204170590
 GameObject:
   m_ObjectHideFlags: 0

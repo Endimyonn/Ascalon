@@ -108,7 +108,7 @@ public abstract class AscalonNetModule
 
     public virtual void ReceiveClientInfo(object argData)
     {
-        Debug.Log("Function in example AscalonNetModule was called - use a derived one!");
+        Ascalon.Log("Function in example AscalonNetModule was called - use a derived one!");
 
         //stub
     }

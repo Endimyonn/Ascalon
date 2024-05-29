@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Linq;
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using TMPro;
+#endif
 
 //todo: rewrite this after stock modules are done
 
@@ -45,6 +47,7 @@ public partial class Ascalon
     public string mainConfigName = "config";
     public string mainConfigDirectory = "";
     public bool loadConfigUnityStyle = false;
+    public bool loadConfigGodotStyle = false;
 
 
     //delegates
@@ -158,13 +161,25 @@ public partial class Ascalon
         rconServer.StartListening();
 
         //load config
-        if (!loadConfigUnityStyle)
+        if (loadConfigUnityStyle == true)
         {
-            AscalonConfigTools.ReadConfig(mainConfigDirectory + mainConfigName);
+#if UNITY_2019_1_OR_NEWER
+            AscalonConfigTools.ReadConfigUnity(mainConfigName);
+#else
+            Ascalon.Log("Ascalon has Unity-style config loading enabled, but does not appear to be running inside Unity. Default config not loaded.");
+#endif
+        }
+        else if (loadConfigGodotStyle == true)
+        {
+#if GODOT
+            AscalonConfigTools.ReadConfigGodot(mainConfigName);
+#else
+            Ascalon.Log("Ascalon has Godot-style config loading enabled, but does not appear to be running inside Godot. Default config not loaded.");
+#endif
         }
         else
         {
-            AscalonConfigTools.ReadConfigUnity(mainConfigName);
+            AscalonConfigTools.ReadConfig(mainConfigDirectory + mainConfigName);
         }
 
         ready = true;

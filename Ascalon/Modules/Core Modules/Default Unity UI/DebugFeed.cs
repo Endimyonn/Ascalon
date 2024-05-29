@@ -1,3 +1,4 @@
+#if UNITY_2019_1_OR_NEWER
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -584,55 +585,6 @@ public class DebugFeed : AscalonUIModule
 
 
 
-    [ConCommand("con_clear", "Clear the console of entries")]
-    static void cmd_con_clear()
-    {
-        Ascalon.instance.uiModule.ClearEntries();
-    }
+    
 }
-
-public partial class Ascalon
-{
-    public static void Log(string argTitle, string argContent, LogMode argType)
-    {
-        if (instance.uiModule == null)
-        {
-            Console.WriteLine("FeedEntry > " + argTitle + "\nContent   > " + argContent + "\nType      > " + argType.ToString());
-            return;
-        }
-
-        instance.uiModule.Log(argTitle, argContent, argType);
-    }
-
-    public static void Log(string argTitle, LogMode argType)
-    {
-        if (instance.uiModule == null)
-        {
-            Console.WriteLine("FeedEntry > " + argTitle + "\nType      > " + argType.ToString());
-            return;
-        }
-
-        instance.uiModule.Log(argTitle, "", argType);
-    }
-
-    public static void Log(string argTitle, string argContent)
-    {
-        if (instance.uiModule == null)
-        {
-            Console.WriteLine("FeedEntry > " + argTitle + "\nContent   > " + argContent);
-        }
-
-        instance.uiModule.Log(argTitle, argContent, LogMode.Info);
-    }
-
-    public static void Log(string argTitle)
-    {
-        if (instance.uiModule == null)
-        {
-            Console.WriteLine("FeedEntry > " + argTitle);
-            return;
-        }
-
-        instance.uiModule.Log(argTitle, "", LogMode.Info);
-    }
-}
+#endif

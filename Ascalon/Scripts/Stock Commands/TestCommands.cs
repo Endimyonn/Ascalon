@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine;
+#endif
 
 public class TestCommands
 {
-    /*
-
     [ConCommand("test_testerfunc", "command testing command")]
     static void cmd_test_testerfunc()
     {
@@ -54,8 +55,7 @@ public class TestCommands
     {
         DataChanged = (object oldData, object newData) =>
         {
-            //Debug.Log("passed");
-            Debug.Log("test_testervar1 DataChanged callback triggered!. old data: " + oldData + " | new data: " + newData);
+            Ascalon.Log("test_testervar1 DataChanged callback triggered!. old data: " + oldData + " | new data: " + newData);
         }
     };
 
@@ -64,7 +64,7 @@ public class TestCommands
     {
         DataChanged = (object oldData, object newData) =>
         {
-            Debug.Log("test_testervar2 has datachanged. old data: " + oldData + " | new data: " + newData);
+            Ascalon.Log("test_testervar2 has datachanged. old data: " + oldData + " | new data: " + newData);
         }
     };
 
@@ -73,7 +73,7 @@ public class TestCommands
     {
         DataChanged = (object oldData, object newData) =>
         {
-            Debug.Log("test_testervar3 has datachanged. old data: " + oldData + " | new data: " + newData);
+            Ascalon.Log("test_testervar3 has datachanged. old data: " + oldData + " | new data: " + newData);
         }
     };
 
@@ -82,14 +82,14 @@ public class TestCommands
     {
         DataChanged = (object oldData, object newData) =>
         {
-            Debug.Log("test_testervar4 has datachanged. old data: " + oldData + " | new data: " + newData);
+            Ascalon.Log("test_testervar4 has datachanged. old data: " + oldData + " | new data: " + newData);
         }
     };
 
     [ConCommand("test_testerfunc5", "Testing command for testing ConVar accessing")]
     static void cmd_test_testerfunc5()
     {
-        Debug.Log("The value of test_testervar1 is: " + Ascalon.GetConVar("test_testervar1"));
+        Ascalon.Log("The value of test_testervar1 is: " + Ascalon.GetConVar("test_testervar1"));
     }
 
     [ConVar("test_testervar5", "Test of ConFlag.Save", ConFlags.Save)]
@@ -101,7 +101,7 @@ public class TestCommands
     [ConCommand("test_cheatcmd", "Test of ConFlag.Cheat", ConFlags.Cheat)]
     static void cmd_test_cheatcmd()
     {
-        Debug.Log("Cheats are enabled!");
+        Ascalon.Log("Cheats are enabled!");
     }
 
     [ConVar("test_clampvar", "Test of ConVar clamping code")]
@@ -121,21 +121,32 @@ public class TestCommands
 
     };
 
+    #if UNITY_2019_1_OR_NEWER
     [ConCommand("obj_moveupfive", "Move a GameObject up 5 units", ConFlags.Cheat)]
     static void cmd_obj_moveupfive(GameObjectFinder argGameObject)
     {
         argGameObject.result.transform.position += new Vector3(0, 5, 0);
     }
+    #endif
 
     [ConVar("test_array", "Another test of ConVar array implementation")]
     static ConVar cvar_test_array = new ConVar(new float[] { 5, 10, 15, 20, 21, 23 })
     {
         DataChanged = (object oldData, object newData) =>
         {
-            Debug.Log("test_array has datachanged. old data: " + oldData + " | new data: " + newData);
+            Ascalon.Log("test_array has datachanged. old data: " + oldData + " | new data: " + newData);
         }
     };
 
     [ConVar("hud_showhints", "Show hint popups in-game", ConFlags.Save)]
-    static ConVar cvar_hud_showhints = new ConVar(true);*/
+    static ConVar cvar_hud_showhints = new ConVar(true);
+
+    [ConCommand("test_floodlog")]
+    static void cmd_test_floodlog(string argText, int argCount)
+    {
+        for (int i = 0; i < argCount; i++)
+        {
+            Ascalon.Log(argText);
+        }
+    }
 }

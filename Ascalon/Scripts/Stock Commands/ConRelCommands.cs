@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine;
+#endif
 
 //This class defines commands and ConVars related to the system itself.
 //Some of these are vital to the system's function and are marked as
@@ -134,14 +137,22 @@ public class ConRelCommands
     [ConCommand("client_writeconfig", "Write a configuration file with the specified name")]
     static void cmd_client_writeconfig(string argConfigName)
     {
-        Debug.Log("Writing config to \"" + Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argConfigName + ".cfg\"");
+        #if UNITY_2019_1_OR_NEWER
+        Ascalon.Log("Writing config to \"" + Application.persistentDataPath + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + argConfigName + ".cfg\"");
         AscalonConfigTools.WriteConfigUnity(argConfigName);
+        #elif GODOT
+        AscalonConfigTools.WriteConfigGodot(argConfigName);
+        #endif
     }
 
     [ConCommand("client_runconfig", "Run a configuration file with the specified name")]
     static void cmd_client_runconfig(string argConfigName)
     {
+        #if UNITY_2019_1_OR_NEWER
         AscalonConfigTools.ReadConfigUnity(argConfigName);
+        #elif GODOT
+        AscalonConfigTools.ReadConfigGodot(argConfigName);
+        #endif
     }
 
     //-------------------//

@@ -1,3 +1,4 @@
+#if UNITY_2019_1_OR_NEWER
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,3 +11,4 @@ public class DisableUIOnStart : MonoBehaviour
         gameObject.SetActive(false);
     }
 }
+#endif

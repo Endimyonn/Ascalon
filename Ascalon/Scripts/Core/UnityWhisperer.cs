@@ -22,6 +22,7 @@ public class UnityWhisperer : MonoBehaviour
         {
             Debug.Log("Duplicate UnityWhisperer was spawned, this is not allowed.");
             Destroy(this);
+            return;
         }
         instance = this;
     }

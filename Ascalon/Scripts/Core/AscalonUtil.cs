@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System;
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine;
+#elif GODOT
+using Godot;
+#endif
 
 //todo: merge into main class?
 public class AscalonUtil
@@ -77,6 +81,7 @@ public class AscalonUtil
 
     public static Vector3 MouseWorldPosition()
     {
+#if UNITY_2019_1_OR_NEWER
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 150f))
@@ -87,6 +92,10 @@ public class AscalonUtil
         {
             return new Vector3(0f, 0f, 0f);
         }
+#elif GODOT
+        GD.Print("MouseWorldPosition is not yet implemented under Godot");
+        return Vector3.Zero;
+#endif
     }
 
     public static float RandomFloatInRange(float argMin, float argMax)

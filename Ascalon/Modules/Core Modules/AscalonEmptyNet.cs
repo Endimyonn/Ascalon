@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
 
 //DUMMY network module
-public class AscalonMirrorNet : AscalonNetModule
+public class AscalonEmptyNet : AscalonNetModule
 {
 
     public override void Initialize()
@@ -14,7 +13,7 @@ public class AscalonMirrorNet : AscalonNetModule
 
     public void InitializeNet()
     {
-        Console.WriteLine("Ascalon running offline");
+        Ascalon.Log("Ascalon running offline");
     }
 
 

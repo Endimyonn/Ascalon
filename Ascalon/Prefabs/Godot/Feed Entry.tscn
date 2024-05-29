@@ -1,0 +1,58 @@
+[gd_scene load_steps=6 format=3 uid="uid://d2rplbg0sahlo"]
+
+[ext_resource type="Script" path="res://Ascalon/Modules/Core Modules/Godot UI/GodotConsoleFeedEntry.cs" id="1_7yvoq"]
+[ext_resource type="Texture2D" uid="uid://dcawswdox8bp6" path="res://Ascalon/Images/debugconsole_info.png" id="2_g4bo1"]
+[ext_resource type="Texture2D" uid="uid://bnhaxjbr1n4es" path="res://Ascalon/Images/debugconsole_warning.png" id="3_ybrjm"]
+[ext_resource type="Texture2D" uid="uid://bxs2hmjm7b8wk" path="res://Ascalon/Images/debugconsole_error.png" id="4_buyon"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_wqvmv"]
+font_size = 10
+
+[node name="Feed Entry" type="Panel" node_paths=PackedStringArray("infoIcon", "warningIcon", "errorIcon", "contentLabel")]
+custom_minimum_size = Vector2(0, 50)
+script = ExtResource("1_7yvoq")
+infoIcon = NodePath("Info Icon")
+warningIcon = NodePath("Warning Icon")
+errorIcon = NodePath("Error Icon")
+contentLabel = NodePath("Label")
+
+[node name="Info Icon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 9.0
+grow_vertical = 2
+texture = ExtResource("2_g4bo1")
+
+[node name="Warning Icon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 9.0
+grow_vertical = 2
+texture = ExtResource("3_ybrjm")
+
+[node name="Error Icon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 9.0
+grow_vertical = 2
+texture = ExtResource("4_buyon")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Entry content... blah blah blah blah blah blah blah blah blah blah blah blah blah blah"
+label_settings = SubResource("LabelSettings_wqvmv")
+vertical_alignment = 1
+autowrap_mode = 3
+text_overrun_behavior = 3

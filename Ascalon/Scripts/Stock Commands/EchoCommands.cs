@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 //Defines various commands that echo a string to the console with the specified
 //entry type.
