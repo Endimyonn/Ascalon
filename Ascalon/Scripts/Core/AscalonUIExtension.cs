@@ -1,5 +1,9 @@
 using System;
 
+#if UNITY_2019_1_OR_NEWER
+using UnityEngine;
+#endif
+
 #if GODOT
 using Godot;
 #endif
