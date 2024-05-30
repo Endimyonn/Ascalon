@@ -12,13 +12,7 @@ using UnityEngine;
 public class ConRelCommands
 {
     [ConVar("con_verbose", "Set verbose mode on debug console")]
-    static ConVar cvar_con_verbose = new ConVar(typeof(bool), false)
-    {
-        DataChanged = (object oldData, object newData) =>
-        {
-
-        }
-    };
+    static ConVar cvar_con_verbose = new ConVar(typeof(bool), false);
 
     [ConCommand("help", "Get info about a command or ConVar")]
     static void cmd_help(string argEntryName)
@@ -154,8 +148,4 @@ public class ConRelCommands
         AscalonConfigTools.ReadConfigGodot(argConfigName);
         #endif
     }
-
-    //-------------------//
-    // End vital section //
-    //-------------------//
 }
