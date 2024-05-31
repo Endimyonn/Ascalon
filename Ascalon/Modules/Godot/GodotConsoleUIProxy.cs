@@ -505,7 +505,7 @@ public partial class GodotConsoleUIProxy : Control
     }
     #endregion
 
-    [ConVar("con_entry_autofocus", "If enabled, the command entry area will be automatically focused upon activating the console UI.")]
+    [ConVar("con_entry_autofocus", "If enabled, the command entry area will be automatically focused upon activating the console UI.", ConFlags.Save)]
     static ConVar cvar_con_entry_autofocus = new ConVar(true)
     {
         DataChanged = (object oldData, object newData) =>

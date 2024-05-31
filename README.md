@@ -6,20 +6,20 @@ Ascalon is designed with support for most C# environments, and has special suppo
 ## Quick start
 Ascalon can be quickly set up by directly importing it into a Unity/Godot/C# project. Examples of how to define and use ConCommands and ConVars can be found in `Scripts/Stock Commands/BaseCommands.cs`.
 
-To call a ConCommand or ConVar, run `Ascalon.Call("<command> <args>")`.
+To call a ConCommand or ConVar, run `Ascalon.Call("<command> <args>")`.  
 For example,
 - `Ascalon.Call("con_echo \"Hello World!\"")`
 - `Ascalon.Call("con_verbose true")`
 
 ### Starting Ascalon
-Ascalon must be loaded in. The method of doing so varies by project type.
-If using Unity, it is done by adding an object with the AscalonUnity script.
-If using Godot, the "Ascalon Runner" scene should be added to Autoload.
+Ascalon must be loaded in. The method of doing so varies by project type.  
+If using Unity, it is automatic, and the loader can be configured from its prefab at `Modules/Unity/Resources/Ascalon Runner.prefab`.  
+If using Godot, the "Ascalon Runner" scene should be added to Autoload.  
 Otherwise, an instance may be instantiated and configured directly through whatever means you prefer.
 
 ### Frontend
-For Unity and Godot, Ascalon ships with a UI frontend implementation ready to go.
-If using Unity, the DebugConsoleCanvas prefab includes the frontend as well as a ready-to-go instance of AscalonUnity.
+For Unity and Godot, Ascalon ships with a UI frontend implementation ready to go.  
+If using Unity, the implementation is fully automatic, and loads itself when the project starts. The UI can be found at `Modules/Unity/Resources/Ascalon UI.prefab`.  
 If using Godot, the "Ascalon Console UI" scene includes the frontend, and should be added to Autoload.
 
 ## Features
