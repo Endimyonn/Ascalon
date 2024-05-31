@@ -4,27 +4,15 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Linq;
-#if UNITY_2019_1_OR_NEWER
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
-using TMPro;
-#endif
 
-//todo: rewrite this after stock modules are done
-
-//DebugCore is a tool that implements two major components: a universal command
-//and variable system, and a front-end console to interact with it easily. Commands
-//and ConVars can be defined from anywhere in the project, and are very flexible
-//in operation. It is designed in such a manner as to be easily implemented into
-//any project with little to no modification.
-
-//By design, the console front-end is made to be enabled and visible by default. the
-//implementation of toggling is done on a per-project basis, and no input systems
-//aside from Unity's own EventSystem (for text entry frontend) are used.
-
-//For examples of how to implement commands and ConVars into code, see BaseCommands.cs.
+/// <summary>
+/// Ascalon is a tool that implements a universal command and variable system.
+/// Commands and ConVars can be defined from anywhere in the project, and are
+/// very flexible in operation. It is designed in such a manner as to be easily
+/// implemented into any project with little to no modification.
+/// 
+/// For examples of how to implement commands and ConVars into code, see <see cref="BaseCommands"/>.
+/// </summary>
 [System.Serializable]
 public partial class Ascalon
 {
@@ -42,12 +30,6 @@ public partial class Ascalon
 
     //lets things know whether initialization completed;
     public bool ready = false;
-
-    //default config info
-    public string mainConfigName = "config";
-    public string mainConfigDirectory = "";
-    public bool loadConfigUnityStyle = false;
-    public bool loadConfigGodotStyle = false;
 
 
     //delegates
@@ -141,15 +123,9 @@ public partial class Ascalon
             gatherTime.Milliseconds / 10));*/
 
         //initialize modules
-        if (uiModule != null)
-        {
-            uiModule.core = this;
-            uiModule.Initialize();
-        }
 
         if (netModule != null)
         {
-            netModule.core = this;
             netModule.Initialize();
         }
         else
@@ -159,28 +135,6 @@ public partial class Ascalon
 
         rconServer = new AscalonRConServer();
         rconServer.StartListening();
-
-        //load config
-        if (loadConfigUnityStyle == true)
-        {
-#if UNITY_2019_1_OR_NEWER
-            AscalonConfigTools.ReadConfigUnity(mainConfigName);
-#else
-            Ascalon.Log("Ascalon has Unity-style config loading enabled, but does not appear to be running inside Unity. Default config not loaded.");
-#endif
-        }
-        else if (loadConfigGodotStyle == true)
-        {
-#if GODOT
-            AscalonConfigTools.ReadConfigGodot(mainConfigName);
-#else
-            Ascalon.Log("Ascalon has Godot-style config loading enabled, but does not appear to be running inside Godot. Default config not loaded.");
-#endif
-        }
-        else
-        {
-            AscalonConfigTools.ReadConfig(mainConfigDirectory + mainConfigName);
-        }
 
         ready = true;
     }

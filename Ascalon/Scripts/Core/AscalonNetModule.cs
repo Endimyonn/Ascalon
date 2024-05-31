@@ -7,11 +7,11 @@ using UnityEngine;
 #endif
 
 //The debug net module is a developer-created interface between
-//the DebugCore and their network library of choice. Any modules
-//created should implement all of this base class, and base.Awake()
-//must be called first.
+//Ascalon and their network library of choice. Any modules created
+//should implement all of this base class, and base.Awake() must
+//be called first.
 
-//This module is necessary for DebugCore to function. If network
+//This module is necessary for Ascalon to function. If network
 //support is not required, an offline module is included for use.
 
 //All defined methods include skeletons to guide how a custom module

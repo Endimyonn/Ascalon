@@ -1,23 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
-#if UNITY_2019_1_OR_NEWER
-using UnityEngine;
-#endif
-
 //The debug UI module provides a front-end for the developer
-//and users to work with the DebugCore - this can be through
+//and users to work with the Ascalon - this can be through
 //sending Calls to it and/or receiving output from it.
 
-//This module is not necessary for DebugCore to function.
+//This module is not necessary for Ascalon to function.
 [System.Serializable]
 public abstract class AscalonUIModule
 {
     //singleton
     public static AscalonUIModule instance;
-
-    //reference to the core Ascalon instance
-    public Ascalon core;
 
     public virtual void Initialize()
     {

@@ -1,0 +1,234 @@
+[gd_scene load_steps=16 format=3 uid="uid://dkp6h54xbpy3v"]
+
+[ext_resource type="Script" path="res://Ascalon/Modules/Godot/GodotConsoleUIProxy.cs" id="1_vywvt"]
+[ext_resource type="PackedScene" uid="uid://d2rplbg0sahlo" path="res://Ascalon/Modules/Godot/Scenes/Feed Entry.tscn" id="2_jaa5v"]
+[ext_resource type="Script" path="res://Ascalon/Modules/Godot/LineEditClickOff.cs" id="3_npoas"]
+[ext_resource type="Script" path="res://Ascalon/Modules/Godot/GodotDragBar.cs" id="3_ys2pg"]
+[ext_resource type="Texture2D" uid="uid://cpyl4gsy3mgh3" path="res://Ascalon/Images/down arrow white.png" id="4_b1n2o"]
+[ext_resource type="Texture2D" uid="uid://dcawswdox8bp6" path="res://Ascalon/Images/debugconsole_info.png" id="4_ndwqn"]
+[ext_resource type="Texture2D" uid="uid://bnhaxjbr1n4es" path="res://Ascalon/Images/debugconsole_warning.png" id="5_fdn6e"]
+[ext_resource type="Texture2D" uid="uid://bxs2hmjm7b8wk" path="res://Ascalon/Images/debugconsole_error.png" id="6_0g6on"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_u4fwc"]
+line_spacing = 0.0
+font_size = 14
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hplya"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v6wu3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_57687"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mmnus"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_31af6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8wrhb"]
+content_margin_left = 3.0
+content_margin_right = 3.0
+bg_color = Color(0.137255, 0.137255, 0.137255, 0.658824)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="Ascalon Console UI" type="Panel" node_paths=PackedStringArray("inputArea", "inputSuggestionLabel", "entryScrollContainer", "stayAtBottomCheckBox", "entryParent", "infoFilterButton", "warningFilterButton", "errorFilterButton")]
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 300.0
+offset_bottom = 310.0
+script = ExtResource("1_vywvt")
+entryTemplate = ExtResource("2_jaa5v")
+inputArea = NodePath("Entry")
+inputSuggestionLabel = NodePath("Suggestions")
+entryScrollContainer = NodePath("Feed")
+stayAtBottomCheckBox = NodePath("Buttons/Stay At Bottom CheckBox")
+entryParent = NodePath("Feed/VBoxContainer")
+infoFilterButton = NodePath("Buttons/Info Button")
+warningFilterButton = NodePath("Buttons/Warning Button")
+errorFilterButton = NodePath("Buttons/Error Button")
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 5.0
+offset_right = 53.0
+offset_bottom = 25.0
+text = "Ascalon"
+label_settings = SubResource("LabelSettings_u4fwc")
+vertical_alignment = 1
+
+[node name="Entry" type="LineEdit" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -25.0
+offset_right = -50.0
+grow_vertical = 0
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath(".")
+focus_previous = NodePath(".")
+theme_override_font_sizes/font_size = 11
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hplya")
+middle_mouse_paste_enabled = false
+drag_and_drop_selection_enabled = false
+caret_blink = true
+script = ExtResource("3_npoas")
+
+[node name="Submit Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+tooltip_text = "Submit the typed call"
+theme_override_font_sizes/font_size = 12
+theme_override_styles/focus = SubResource("StyleBoxEmpty_v6wu3")
+text = "Submit"
+
+[node name="Drag Area" type="Control" parent="." node_paths=PackedStringArray("dragRecipient")]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 50.0
+grow_horizontal = 2
+script = ExtResource("3_ys2pg")
+dragRecipient = NodePath("..")
+
+[node name="Feed" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 50.0
+offset_bottom = -25.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Feed"]
+clip_children = 2
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_top = 25.0
+offset_right = 83.0
+offset_bottom = 50.0
+
+[node name="Info Button" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Toggle the visibility of Info feed entries"
+theme_override_font_sizes/font_size = 12
+theme_override_styles/focus = SubResource("StyleBoxEmpty_57687")
+icon = ExtResource("4_ndwqn")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Warning Button" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Toggle the visibility of Warning feed entries"
+theme_override_font_sizes/font_size = 12
+theme_override_styles/focus = SubResource("StyleBoxEmpty_57687")
+icon = ExtResource("5_fdn6e")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Error Button" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Toggle the visibility of Error feed entries"
+theme_override_font_sizes/font_size = 12
+theme_override_styles/focus = SubResource("StyleBoxEmpty_57687")
+icon = ExtResource("6_0g6on")
+icon_alignment = 1
+expand_icon = true
+
+[node name="VSeparator" type="VSeparator" parent="Buttons"]
+layout_mode = 2
+
+[node name="Scroll To Bottom Button" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Scroll to bottom"
+theme_override_styles/focus = SubResource("StyleBoxEmpty_mmnus")
+icon = ExtResource("4_b1n2o")
+expand_icon = true
+
+[node name="Stay At Bottom CheckBox" type="CheckBox" parent="Buttons"]
+layout_mode = 2
+tooltip_text = "Stay at the bottom of the log when new entries
+are added, if it was already at the bottom prior."
+theme_override_font_sizes/font_size = 12
+theme_override_styles/focus = SubResource("StyleBoxEmpty_mmnus")
+button_pressed = true
+text = "Stay"
+
+[node name="VSeparator2" type="VSeparator" parent="Buttons"]
+layout_mode = 2
+
+[node name="Clear Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_top = 25.0
+grow_horizontal = 0
+tooltip_text = "Clear the entry feed"
+theme_override_font_sizes/font_size = 12
+theme_override_styles/focus = SubResource("StyleBoxEmpty_31af6")
+text = "Clear"
+
+[node name="Close Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -25.0
+offset_bottom = 25.0
+grow_horizontal = 0
+tooltip_text = "Close the panel"
+theme_override_font_sizes/font_size = 12
+theme_override_styles/focus = SubResource("StyleBoxEmpty_31af6")
+text = "X"
+
+[node name="Suggestions" type="Label" parent="."]
+custom_minimum_size = Vector2(196, 0)
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 198.0
+offset_bottom = 18.0
+theme_type_variation = &"TooltipLabel"
+theme_override_constants/line_spacing = 0
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_8wrhb")
+
+[connection signal="text_changed" from="Entry" to="." method="UpdateSuggestions"]
+[connection signal="text_submitted" from="Entry" to="." method="Call"]
+[connection signal="pressed" from="Submit Button" to="." method="Call"]
+[connection signal="gui_input" from="Drag Area" to="Drag Area" method="_Input"]
+[connection signal="mouse_entered" from="Drag Area" to="Drag Area" method="SetHovered" binds= [true]]
+[connection signal="mouse_exited" from="Drag Area" to="Drag Area" method="SetHovered" binds= [false]]
+[connection signal="pressed" from="Buttons/Info Button" to="." method="ToggleInfoEntries"]
+[connection signal="pressed" from="Buttons/Warning Button" to="." method="ToggleWarningEntries"]
+[connection signal="pressed" from="Buttons/Error Button" to="." method="ToggleErrorEntries"]
+[connection signal="pressed" from="Buttons/Scroll To Bottom Button" to="." method="ScrollToBottomButtonPressed"]
+[connection signal="toggled" from="Buttons/Stay At Bottom CheckBox" to="." method="StayAtBottomCheckBoxChanged"]
+[connection signal="pressed" from="Clear Button" to="." method="ClearEntries"]
+[connection signal="pressed" from="Close Button" to="." method="CloseButtonPressed"]
