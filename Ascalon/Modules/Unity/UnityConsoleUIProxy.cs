@@ -29,6 +29,9 @@ public class UnityConsoleUIProxy : MonoBehaviour
     private bool canUseAutoComplete = false;
     private string autoCompleteValue = string.Empty;
 
+    //command memory
+    private string lastCommand = string.Empty;
+
 
     [Header("Settings")]
     public int maxEntries = 100;
@@ -79,7 +82,7 @@ public class UnityConsoleUIProxy : MonoBehaviour
     private void Update()
     {
         //window toggle hotkey
-        if (Input.GetKeyDown(KeyCode.BackQuote))
+        if (Input.GetKeyDown(KeyCode.BackQuote) == true)
         {
             if (windowActive == false || inputArea.isFocused == false)
             {
@@ -92,13 +95,23 @@ public class UnityConsoleUIProxy : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Tab) == true)
         {
             if (canUseAutoComplete == true)
             {
                 inputArea.text = autoCompleteValue;
                 inputArea.caretPosition = inputArea.text.Length;
                 canUseAutoComplete = false;
+                UpdateSuggestions();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.UpArrow) == true)
+        {
+            if (string.IsNullOrEmpty(lastCommand) == false && string.IsNullOrWhiteSpace(lastCommand) == false)
+            {
+                inputArea.text = lastCommand;
+                inputArea.caretPosition = inputArea.text.Length;
                 UpdateSuggestions();
             }
         }
@@ -255,6 +268,7 @@ public class UnityConsoleUIProxy : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(inputArea.text) == false)
         {
+            lastCommand = inputArea.text;
             Ascalon.Call(inputArea.text, new AscalonCallContext(AscalonCallSource.User));
         }
         inputArea.text = string.Empty;

@@ -30,7 +30,7 @@ public class UnityUITooltipController : MonoBehaviour
 
     private void Update()
     {
-        if (tooltipObject.gameObject.activeSelf == true)
+        if (tooltipObject.gameObject.activeSelf == true && Application.isFocused == true)
         {
             tooltipObject.anchoredPosition = Input.mousePosition + offset;
         }

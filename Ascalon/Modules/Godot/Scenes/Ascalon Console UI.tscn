@@ -75,6 +75,7 @@ focus_next = NodePath(".")
 focus_previous = NodePath(".")
 theme_override_font_sizes/font_size = 11
 theme_override_styles/focus = SubResource("StyleBoxEmpty_hplya")
+virtual_keyboard_enabled = false
 middle_mouse_paste_enabled = false
 drag_and_drop_selection_enabled = false
 caret_blink = true

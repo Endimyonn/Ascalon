@@ -29,6 +29,9 @@ public partial class GodotConsoleUIProxy : Control
     private bool canUseAutoComplete = false;
     private string autoCompleteValue = string.Empty;
 
+    //command memory
+    private string lastCommand = string.Empty;
+
 
     //settings
     [Export] public int maxEntries = 100;
@@ -111,6 +114,22 @@ public partial class GodotConsoleUIProxy : Control
                     inputArea.Text = autoCompleteValue;
                     inputArea.CaretColumn = autoCompleteValue.Length;
                     canUseAutoComplete = false;
+                    UpdateSuggestions(inputArea.Text);
+                }
+            }
+        }
+    }
+
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if (@event is InputEventKey keyEvent)
+        {
+            if (keyEvent.Keycode == Key.Up && keyEvent.Echo == false)
+            {
+                if (string.IsNullOrEmpty(lastCommand) == false && string.IsNullOrWhiteSpace(lastCommand) == false)
+                {
+                    inputArea.Text = lastCommand;
+                    inputArea.CaretColumn = inputArea.Text.Length;
                     UpdateSuggestions(inputArea.Text);
                 }
             }
@@ -259,6 +278,7 @@ public partial class GodotConsoleUIProxy : Control
     {
         if (string.IsNullOrWhiteSpace(inputArea.Text) == false)
         {
+            lastCommand = inputArea.Text;
             Ascalon.Call(argCall, new AscalonCallContext(AscalonCallSource.User));
         }
         inputArea.Clear();
