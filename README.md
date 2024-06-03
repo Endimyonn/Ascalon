@@ -17,7 +17,7 @@ Ascalon can be installed by directly importing it into a Unity/Godot/C# project.
 
 Under Unity, nothing extra needs to be done beyond importing it into the project. The "runner" (responsible for core initialization) and UI are loaded during startup automatically, and their prefabs can be found under `Modules/Unity/Resources/` if the startup configuration needs to be adjusted. Unity 2019.1 or newer is required.
 
-Under Godot, the runner and UI frontend should be added to the project's Autoload configuration. They can be found under `Modules/Godot/Scenes/`. The `Feed Entry` scene should not be added. Godot 4 or newer is recommended. 3.x may work, has not been tested.
+Under Godot, the runner and UI frontend should be added to the project's Autoload configuration. They can be found under `Modules/Godot/Scenes/`. The `Feed Entry` scene should not be added. Godot 4 or newer is recommended. 3.x may work, but has not been tested.
 
 Otherwise, the Ascalon core must be initialized and configured manually. This involves creating a new `Ascalon`, configuring its module fields, and then calling the `Initialize()` method on it. See the built-in Unity/Godot runners for examples (in files `AscalonUnity.cs` and `AscalonGodot.cs`) of how to go about initialization.
 
@@ -40,7 +40,7 @@ Ascalon supports networking in two ways: a networking module and RCon support.
 
 The networking module is resposible for enabling commands and ConVars to be sent from client to server (or client to client). Due to the high number of networking libraries out there, it is impossible for me as a solo developer to support all of them. Currently, Mirror Networking support is included. To implement support for a library, a class deriving from `AscalonNetModule` should be created and hooked up to the Ascalon core during its initialization.
 
-RCon (remote control) support comes in the form of an included client (`AscalonRConModule`) connected to the core, and a simple server that runs alongside Ascalon. The client encodes a call and a password and sends it to the server.
+RCon (remote control) support comes in the form of an included client (`AscalonRConModule`) and a simple server that runs alongside Ascalon. The client includes a command to encode a call and a password and send it to a remote server, specified by the ConVars defined by the client.
 
 ConFlags, which are assigned when defining a command or ConVar, can (among other things) determine whether a command/ConVar is network-eligible, how it is used in a networked environment, and whether it may be used over RCon.
 
