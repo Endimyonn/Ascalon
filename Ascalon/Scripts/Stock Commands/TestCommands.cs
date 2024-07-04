@@ -138,8 +138,10 @@ public class TestCommands
         }
     };
 
+	/*
     [ConVar("hud_showhints", "Show hint popups in-game", ConFlags.Save)]
     static ConVar cvar_hud_showhints = new ConVar(true);
+	*/
 
     [ConCommand("test_floodlog")]
     static void cmd_test_floodlog(string argText, int argCount)

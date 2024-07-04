@@ -23,36 +23,54 @@ public partial class Ascalon
         {
             argContent = $"# Ascalon Log ({argType.ToString()}):\n" + argContent;
         }
-        
-#if UNITY_2019_1_OR_NEWER
-        if (argType == LogMode.Info || argType == LogMode.InfoVerbose)
-        {
-            Debug.Log(argContent);
-        }
-        else if (argType == LogMode.Warning || argType == LogMode.WarningVerbose)
-        {
-            Debug.LogWarning(argContent);
-        }
-        else
-        {
-            Debug.LogError(argContent);
-        }
-#elif GODOT
-        if (argType == LogMode.Info || argType == LogMode.InfoVerbose)
-        {
-            GD.Print(argContent);
-        }
-        else if (argType == LogMode.Warning || argType == LogMode.WarningVerbose)
-        {
-            GD.PushWarning(argContent);
-        }
-        else
-        {
-            GD.PrintErr(argContent);
-        }
-#else
+
+        //get current verbosity
+        bool verbose = (bool)Ascalon.GetConVar("con_verbose");
+
+    #if !(UNITY_2019_1_OR_NEWER || GODOT) //default handling (not an explicitly supported environment)
         Console.WriteLine(argContent);
-#endif
+    #else //environment-specific handling
+        if (argType == LogMode.Info || (argType == LogMode.InfoVerbose && verbose == true))
+        {
+        #if UNITY_2019_1_OR_NEWER
+            Debug.Log(argContent);
+        #elif GODOT
+            GD.Print(argContent);
+        #endif
+        }
+        else if (argType == LogMode.Warning || (argType == LogMode.WarningVerbose && verbose == true))
+        {
+        #if UNITY_2019_1_OR_NEWER
+            Debug.LogWarning(argContent);
+        #elif GODOT
+            GD.PushWarning(argContent);
+        #endif
+        }
+        else if (argType == LogMode.Error || (argType == LogMode.ErrorVerbose && verbose == true))
+        {
+        #if UNITY_2019_1_OR_NEWER
+            Debug.LogError(argContent);
+        #elif GODOT
+            GD.PrintErr(argContent);
+        #endif
+        }
+        else if (argType == LogMode.Exception || (argType == LogMode.ExceptionVerbose && verbose == true))
+        {
+        #if UNITY_2019_1_OR_NEWER
+            Debug.LogError(argContent);
+        #elif GODOT
+            GD.PrintErr(argContent);
+        #endif
+        }
+        else if (argType == LogMode.Assertion || (argType == LogMode.AssertionVerbose && verbose == true))
+        {
+        #if UNITY_2019_1_OR_NEWER
+            Debug.LogError(argContent);
+        #elif GODOT
+            GD.PrintErr(argContent);
+        #endif
+        }
+    #endif
     }
 
     public static void Log(string argTitle, string argContent, LogMode argType)
