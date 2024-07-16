@@ -97,23 +97,29 @@ public class UnityConsoleUIProxy : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Tab) == true)
         {
-            if (canUseAutoComplete == true)
-            {
-                inputArea.text = autoCompleteValue;
-                inputArea.caretPosition = inputArea.text.Length;
-                canUseAutoComplete = false;
-                UpdateSuggestions();
-            }
+            if (windowActive == true)
+			{
+				if (canUseAutoComplete == true)
+				{
+					inputArea.text = autoCompleteValue;
+					inputArea.caretPosition = inputArea.text.Length;
+					canUseAutoComplete = false;
+					UpdateSuggestions();
+				}
+			}
         }
 
         if (Input.GetKeyDown(KeyCode.UpArrow) == true)
         {
-            if (string.IsNullOrEmpty(lastCommand) == false && string.IsNullOrWhiteSpace(lastCommand) == false)
-            {
-                inputArea.text = lastCommand;
-                inputArea.caretPosition = inputArea.text.Length;
-                UpdateSuggestions();
-            }
+            if (windowActive == true)
+			{
+				if (string.IsNullOrEmpty(lastCommand) == false && string.IsNullOrWhiteSpace(lastCommand) == false)
+				{
+					inputArea.text = lastCommand;
+					inputArea.caretPosition = inputArea.text.Length;
+					UpdateSuggestions();
+				}
+			}
         }
 
         //ensure window is within viewport

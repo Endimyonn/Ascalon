@@ -109,12 +109,15 @@ public partial class GodotConsoleUIProxy : Control
             
             if (keyEvent.Keycode == Key.Tab && keyEvent.Echo == false)
             {
-                if (canUseAutoComplete == true)
+                if (windowActive == true)
                 {
-                    inputArea.Text = autoCompleteValue;
-                    inputArea.CaretColumn = autoCompleteValue.Length;
-                    canUseAutoComplete = false;
-                    UpdateSuggestions(inputArea.Text);
+                    if (canUseAutoComplete == true)
+                    {
+                        inputArea.Text = autoCompleteValue;
+                        inputArea.CaretColumn = autoCompleteValue.Length;
+                        canUseAutoComplete = false;
+                        UpdateSuggestions(inputArea.Text);
+                    }
                 }
             }
         }
@@ -126,11 +129,14 @@ public partial class GodotConsoleUIProxy : Control
         {
             if (keyEvent.Keycode == Key.Up && keyEvent.Echo == false)
             {
-                if (string.IsNullOrEmpty(lastCommand) == false && string.IsNullOrWhiteSpace(lastCommand) == false)
+                if (windowActive == true)
                 {
-                    inputArea.Text = lastCommand;
-                    inputArea.CaretColumn = inputArea.Text.Length;
-                    UpdateSuggestions(inputArea.Text);
+                    if (string.IsNullOrEmpty(lastCommand) == false && string.IsNullOrWhiteSpace(lastCommand) == false)
+                    {
+                        inputArea.Text = lastCommand;
+                        inputArea.CaretColumn = inputArea.Text.Length;
+                        UpdateSuggestions(inputArea.Text);
+                    }
                 }
             }
         }
