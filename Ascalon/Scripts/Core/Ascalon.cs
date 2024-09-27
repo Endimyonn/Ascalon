@@ -88,7 +88,7 @@ public partial class Ascalon
                     ConCommandAttribute foundAttribute = (ConCommandAttribute)foundMethod.GetCustomAttribute(typeof(ConCommandAttribute));
 
                     //create a new ConCommand and add it to the master list
-                    conCommands.Add(new ConCommand(foundAttribute.cmdName, foundAttribute.cmdDescription, foundMethod, foundAttribute.cmdFlags));
+                    conCommands.Add(new ConCommand(foundAttribute.cmdName, foundAttribute.cmdDescription, foundAttribute.cmdFlags, foundMethod));
                 }
                 else if (foundMethod.GetCustomAttributes(typeof(AscalonParameterParserAttribute), false).Length > 0)
                 {
@@ -590,7 +590,6 @@ public partial class Ascalon
 
 
 
-    
 
 
 
@@ -598,36 +597,82 @@ public partial class Ascalon
 
 
 
-    public static object GetConVar(string argConVarName) //todo: custom struct or tuple with bool and object for better nullreference handling?
+
+    /// <summary>
+    /// Gets the data held by a ConVar.
+    /// </summary>
+    /// <param name="argConVarName">The name of the ConVar as defined in its <see cref="ConVarAttribute"/></param>
+    /// <returns>The ConVar's data as an <see cref="object"/></returns>
+    public static object GetConVar(string argConVarName)
     {
         return Ascalon.instance.conVars.FirstOrDefault(ConVar => ConVar.name == argConVarName).GetData();
     }
 
+    /// <summary>
+    /// Gets the data held by a ConVar. The proper type must be specified, which avoids having to cast it outside of this function.
+    /// </summary>
+    /// <typeparam name="T">The type of data held by the ConVar</typeparam>
+    /// <param name="argConVarName">The name of the ConVar as defined in its <see cref="ConVarAttribute"/></param>
+    /// <returns>The ConVar's data</returns>
+    public static T GetConVar<T>(string argConVarName)
+    {
+        return (T)Ascalon.instance.conVars.FirstOrDefault(ConVar => ConVar.name == argConVarName).GetData();
+    }
+
+    /// <summary>
+    /// Sets the data of a ConVar.
+    /// </summary>
+    /// <param name="argConVarName">The name of the ConVar as defined in its <see cref="ConVarAttribute"/></param>
+    /// <param name="argConVarData">The data to store</param>
     public static void SetConVar(string argConVarName, object argConVarData)
     {
         Ascalon.Call(argConVarName + " " + argConVarData.ToString());
     }
 
+    /// <summary>
+    /// Gets the metadata entry of a ConCommand.
+    /// </summary>
+    /// <param name="argCommandName">The name of the ConCommand as defined in its <see cref="ConCommandAttribute"/></param>
     public static ConCommand GetConCommandEntry(string argCommandName)
     {
         return Ascalon.instance.conCommands.FirstOrDefault(ConCommand => ConCommand.name == argCommandName);
     }
 
+    /// <summary>
+    /// Gets the metadata entry of a ConVar.
+    /// </summary>
+    /// <param name="argConVarName">The name of the ConVar as defined in its <see cref="ConVarAttribute"/></param>
+    /// <returns></returns>
     public static ConVar GetConVarEntry(string argConVarName)
     {
         return Ascalon.instance.conVars.FirstOrDefault(ConVar => ConVar.name == argConVarName);
     }
 
+    /// <summary>
+    /// Checks whether a ConCommand exists and has been loaded.
+    /// </summary>
+    /// <param name="argEntryName">The name of the ConCommand as defined in its <see cref="ConCommandAttribute"/></param>
+    /// <returns>True if the ConCommand exists, false otherwise</returns>
     public static bool ConCommandExists(string argEntryName)
     {
         return Ascalon.instance.conCommands.Any(ConCommand => ConCommand.name == argEntryName);
     }
 
+    /// <summary>
+    /// Checks whether a ConVar exists and has been loaded.
+    /// </summary>
+    /// <param name="argEntryName">The name of the ConVar as defined in its <see cref="ConVarAttribute"/></param>
+    /// <returns>True if the ConVar exists, false otherwise</returns>
     public static bool ConVarExists(string argEntryName)
     {
         return Ascalon.instance.conVars.Any(ConVar => ConVar.name == argEntryName);
     }
 
+    /// <summary>
+    /// Checks whether a ConCommand or ConVar exists and has been loaded.
+    /// </summary>
+    /// <param name="argEntryName">The name of the ConCommand or ConVar as defined in its <see cref="ConCommandAttribute"/> or <see cref="ConVarAttribute"/></param>
+    /// <returns>True if any ConCommand or ConVar by the name exists, false otherwise</returns>
     public static bool CommandOrConVarExists(string argEntryName)
     {
         return (ConCommandExists(argEntryName) == true || ConVarExists(argEntryName) == true);
@@ -642,26 +687,30 @@ public partial class Ascalon
 
 
 
-//container to hold everything the console needs to work with commands and display info to the visual console
+/// <summary>
+/// Metadata container for console commands, serves as the main method for accessing them.
+/// </summary>
 public struct ConCommand
 {
-    public string name;
-    public string description;
-    public MethodInfo method;
-    public ConFlags flags;
-    public ParameterInfo[] parms;
+    public string name;             //the command's name
+    public string description;      //the command's description (optional)
+    public ConFlags flags;          //the command's flags
+    public MethodInfo method;       //the method associated with the command
+    public ParameterInfo[] parms;   //parameter metadata of the command's associated method
 
-    public ConCommand(string argName, string argDescription, MethodInfo argMethod, ConFlags argFlags)
+    public ConCommand(string argName, string argDescription, ConFlags argFlags, MethodInfo argMethod)
     {
         name = argName;
         description = argDescription;
-        method = argMethod;
         flags = argFlags;
+        method = argMethod;
         parms = method.GetParameters();
     }
 }
 
-//container to hold ConCommand or ConVar (or more) plus flags for Call()
+/// <summary>
+/// Container to temporarily hold a ConCommand or ConVar. Used by <see cref="Ascalon.Call(string, AscalonCallContext)"/>.
+/// </summary>
 public class MiscConObject
 {
     public object conObject;
@@ -674,6 +723,9 @@ public class MiscConObject
     }
 }
 
+/// <summary>
+/// The source of a call.
+/// </summary>
 public enum AscalonCallSource
 {
     Internal, //from some local code somewhere
@@ -686,8 +738,8 @@ public enum AscalonCallSource
 [System.Serializable]
 public struct AscalonCallContext
 {
-    public AscalonCallSource source;  //basic source info
-    public string clientName;       //if call came from another client
+    public AscalonCallSource source;    //basic source info
+    public string clientName;           //if call came from another client
 
     public AscalonCallContext(AscalonCallSource argSource, string argClientName = "")
     {

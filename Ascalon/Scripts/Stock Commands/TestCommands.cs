@@ -151,4 +151,12 @@ public class TestCommands
             Ascalon.Log(argText);
         }
     }
+
+    [ConCommand("test_newt", "for testing the newer type-specified GetConVar function")]
+    static void cmd_test_newt()
+    {
+        Ascalon.Log($"(1) con_verbose is {Ascalon.GetConVar<bool>("con_verbose").ToString()}");
+        Ascalon.Log($"(2) con_verbose is {Ascalon.GetConVar<string>("con_verbose").ToString()}");
+        Ascalon.Log($"(3) con_verbose is {Ascalon.GetConVar<int[]>("con_verbose").ToString()}");
+    }
 }

@@ -18,7 +18,7 @@ public partial class AscalonGodot : Node
 
 
 
-	public override void _Ready()
+	AscalonGodot()
 	{
 		if (instance != null)
 		{
