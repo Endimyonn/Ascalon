@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
-//The debug UI module provides a front-end for the developer
-//and users to work with the Ascalon - this can be through
-//sending Calls to it and/or receiving output from it.
-
-//This module is not necessary for Ascalon to function.
+/// <summary>
+/// The UI module provides a front-end for the developer and users to work with Ascalon - this can be through
+/// sending Calls to it and/or receiving output from it. It also provides the basic functionality for logging.
+/// 
+/// This module is not necessary for Ascalon to function.
+/// </summary>
 [System.Serializable]
 public abstract class AscalonUIModule
 {

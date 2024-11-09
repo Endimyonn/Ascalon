@@ -10,6 +10,9 @@ using Godot;
 
 /// <summary>
 /// Extends the Ascalon core to provide logging functions.
+/// This is distinct from the UI Module: the Module provides the basic functionality for logging and UI,
+/// while this is an extension of the core with the primary purposes of providing global static logging
+/// methods and environment-native logging support.
 /// </summary>
 public partial class Ascalon
 {
