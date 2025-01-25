@@ -4,12 +4,11 @@ using System;
 
 /// <summary>
 /// Facilitates the de-selection of a LineEdit when the mouse clicks outside of it.
-/// While this may be handled by Godot if the click is on another UI element, it
-/// doesn't do so without a UI element.
+/// Also marks input to the LineEdit as handled.
 /// </summary>
-public partial class LineEditClickOff : LineEdit
+public partial class LineEditInputHelper : LineEdit
 {
-    public override void _Input(InputEvent @event)
+    public override void _UnhandledInput(InputEvent @event)
     {
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
         {
@@ -20,6 +19,12 @@ public partial class LineEditClickOff : LineEdit
                 {
                     this.ReleaseFocus();
                 }
+            }
+
+            //prevent undesired propagation of input while text entry is active
+            if (HasFocus())
+            {
+                GetViewport().SetInputAsHandled();
             }
         }
     }

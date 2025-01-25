@@ -87,6 +87,7 @@ public partial class GodotConsoleUIProxy : Control
     {
         if (@event is InputEventKey keyEvent)
         {
+            //toggle console
             if (keyEvent.Keycode == Key.Quoteleft && keyEvent.Echo == false)
             {
                 if (keyEvent.Pressed == true)
@@ -106,10 +107,11 @@ public partial class GodotConsoleUIProxy : Control
                     }
                 }
             }
-            
-            if (keyEvent.Keycode == Key.Tab && keyEvent.Echo == false)
+
+            if (inputArea.HasFocus() == true)
             {
-                if (windowActive == true)
+                //autocomplete
+                if (keyEvent.Keycode == Key.Tab && keyEvent.Echo == false)
                 {
                     if (canUseAutoComplete == true)
                     {
@@ -119,17 +121,9 @@ public partial class GodotConsoleUIProxy : Control
                         UpdateSuggestions(inputArea.Text);
                     }
                 }
-            }
-        }
-    }
 
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        if (@event is InputEventKey keyEvent)
-        {
-            if (keyEvent.Keycode == Key.Up && keyEvent.Echo == false)
-            {
-                if (windowActive == true)
+                //last submission recall
+                if (keyEvent.Keycode == Key.Up && keyEvent.Echo == false)
                 {
                     if (string.IsNullOrEmpty(lastCommand) == false && string.IsNullOrWhiteSpace(lastCommand) == false)
                     {
@@ -299,7 +293,7 @@ public partial class GodotConsoleUIProxy : Control
     #region UI Buttons
     public void CloseButtonPressed()
     {
-        this.Visible = false;
+        SetWindowActive(false);
     }
 
     public void ClearEntries()

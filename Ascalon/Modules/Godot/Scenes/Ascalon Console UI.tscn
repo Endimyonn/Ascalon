@@ -1,9 +1,9 @@
 [gd_scene load_steps=16 format=3 uid="uid://dkp6h54xbpy3v"]
 
-[ext_resource type="Script" path="res://Ascalon/Modules/Godot/GodotConsoleUIProxy.cs" id="1_vywvt"]
+[ext_resource type="Script" uid="uid://63k7lds3ca5k" path="res://Ascalon/Modules/Godot/GodotConsoleUIProxy.cs" id="1_vywvt"]
 [ext_resource type="PackedScene" uid="uid://d2rplbg0sahlo" path="res://Ascalon/Modules/Godot/Scenes/Feed Entry.tscn" id="2_jaa5v"]
-[ext_resource type="Script" path="res://Ascalon/Modules/Godot/LineEditClickOff.cs" id="3_npoas"]
-[ext_resource type="Script" path="res://Ascalon/Modules/Godot/GodotDragBar.cs" id="3_ys2pg"]
+[ext_resource type="Script" uid="uid://bm5yu8mb4ml00" path="res://Ascalon/Modules/Godot/LineEditInputHelper.cs" id="3_npoas"]
+[ext_resource type="Script" uid="uid://dskw41u6l3l10" path="res://Ascalon/Modules/Godot/GodotDragBar.cs" id="3_ys2pg"]
 [ext_resource type="Texture2D" uid="uid://cpyl4gsy3mgh3" path="res://Ascalon/Images/down arrow white.png" id="4_b1n2o"]
 [ext_resource type="Texture2D" uid="uid://dcawswdox8bp6" path="res://Ascalon/Images/debugconsole_info.png" id="4_ndwqn"]
 [ext_resource type="Texture2D" uid="uid://bnhaxjbr1n4es" path="res://Ascalon/Images/debugconsole_warning.png" id="5_fdn6e"]
